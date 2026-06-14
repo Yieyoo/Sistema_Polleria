@@ -10,7 +10,7 @@ export default function Navbar() {
         {/* Logo */}
         <a href="/" className="flex items-center gap-3">
           <img
-            src="/logo.png"
+            src="/fotos/logo.jpeg"
             alt="El Pollito Gus"
             className="h-11 w-11 rounded-full object-cover ring-2 ring-gold-500"
             onError={(e) => { e.target.style.display = 'none'; }}

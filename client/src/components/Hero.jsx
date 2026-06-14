@@ -71,7 +71,7 @@ export default function Hero() {
             <div className="w-56 h-56 md:w-72 md:h-72 rounded-full overflow-hidden
                             ring-4 ring-gold-500/60 shadow-2xl shadow-gold-500/20 bg-brand-800">
               <img
-                src="/logo.png"
+                src="/fotos/logo.jpeg"
                 alt="El Pollito Gus"
                 className="w-full h-full object-cover"
                 onError={(e) => {

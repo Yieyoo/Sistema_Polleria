@@ -43,7 +43,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="bg-brand-900 text-gray-400 text-center py-10 mt-12">
-        <img src="/logo.png" alt="El Pollito Gus" className="w-16 h-16 rounded-full mx-auto mb-3 ring-2 ring-gold-600/40 object-cover"
+        <img src="/fotos/logo.jpeg" alt="El Pollito Gus" className="w-16 h-16 rounded-full mx-auto mb-3 ring-2 ring-gold-600/40 object-cover"
           onError={(e) => { e.target.style.display='none'; }} />
         <p className="font-bold text-gold-400 text-lg mb-1">El Pollito Gus</p>
         <p className="text-sm">Pollo Fresco y Confiable</p>
