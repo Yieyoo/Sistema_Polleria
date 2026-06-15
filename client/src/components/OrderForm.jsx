@@ -56,31 +56,42 @@ export default function OrderForm({ onSuccess, onCancel }) {
                       max-h-[95vh] overflow-y-auto shadow-2xl animate-fade-in">
 
         {/* Header */}
-        <div className="sticky top-0 bg-white px-6 pt-6 pb-4 border-b border-gray-100 z-10">
+        <div className="sticky top-0 bg-white px-5 pt-5 pb-4 border-b border-gray-100 z-10
+                        rounded-t-3xl sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">Datos para tu pedido</h2>
-            <button onClick={onCancel} className="text-gray-400 hover:text-gray-600 p-1">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <h2 className="text-lg font-bold text-gray-900">Datos para tu pedido</h2>
+            <button onClick={onCancel}
+              className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100
+                         rounded-xl transition-colors">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
-          {/* Resumen mini */}
-          <div className="mt-3 bg-gray-50 rounded-xl px-4 py-3 text-sm flex justify-between">
-            <span className="text-gray-600">{items.length} {items.length === 1 ? 'producto' : 'productos'}</span>
-            <span className="font-bold text-brand-900">Total: ${subtotal.toFixed(2)}</span>
+
+          {/* Mini resumen */}
+          <div className="mt-3 bg-gray-50 rounded-xl px-4 py-2.5 flex justify-between items-center">
+            <span className="text-gray-500 text-sm">
+              {items.length} {items.length === 1 ? 'producto' : 'productos'}
+            </span>
+            <span className="font-bold text-gray-900 text-sm">Total: ${subtotal.toFixed(2)}</span>
           </div>
-          {/* Aviso recogida */}
-          <div className="mt-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 flex items-center gap-2 text-xs text-amber-800">
+
+          {/* Aviso */}
+          <div className="mt-2.5 bg-orange-50 border border-orange-100 rounded-xl px-3 py-2
+                          flex items-center gap-2 text-xs text-orange-800">
             <span>🏪</span>
             <span><strong>Pedido para recoger en tienda.</strong> Te avisamos por WhatsApp cuando esté listo.</span>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+        <form onSubmit={handleSubmit} className="px-5 py-5 space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-              {error}
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3
+                            rounded-xl text-sm flex items-start gap-2">
+              <span className="text-red-400 flex-shrink-0 mt-0.5">⚠️</span>
+              <span>{error}</span>
             </div>
           )}
 
@@ -106,7 +117,9 @@ export default function OrderForm({ onSuccess, onCancel }) {
               maxLength={20}
               required
             />
-            <p className="text-xs text-gray-400 mt-1">📲 Te mandamos WhatsApp cuando tu pedido esté listo</p>
+            <p className="text-xs text-gray-400 mt-1">
+              📲 Te mandamos WhatsApp cuando tu pedido esté listo
+            </p>
           </Field>
 
           <Field label="Forma de pago *">
@@ -121,10 +134,13 @@ export default function OrderForm({ onSuccess, onCancel }) {
                   onClick={() => update('payment_method', opt.value)}
                   className={`p-3 rounded-xl border-2 text-left transition-all
                               ${form.payment_method === opt.value
-                                ? 'border-brand-900 bg-gray-50'
-                                : 'border-gray-200 hover:border-gray-300'}`}
+                                ? 'border-orange-500 bg-orange-50'
+                                : 'border-gray-200 hover:border-gray-300 bg-white'}`}
                 >
-                  <div className="font-semibold text-gray-900 text-sm">{opt.label}</div>
+                  <div className={`font-semibold text-sm
+                                   ${form.payment_method === opt.value ? 'text-orange-700' : 'text-gray-900'}`}>
+                    {opt.label}
+                  </div>
                   <div className="text-xs text-gray-500 mt-0.5">{opt.desc}</div>
                 </button>
               ))}
@@ -142,15 +158,26 @@ export default function OrderForm({ onSuccess, onCancel }) {
             />
           </Field>
 
-          <div className="pt-2">
+          <div className="pt-1">
             <button
               type="submit"
               disabled={loading}
-              className="w-full gold-gradient disabled:opacity-50 disabled:cursor-not-allowed
-                         text-brand-900 font-black py-4 rounded-xl text-lg
-                         shadow-lg shadow-gold-500/30 hover:opacity-90 transition-opacity"
+              className="w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700
+                         disabled:opacity-50 disabled:cursor-not-allowed
+                         text-white font-bold py-4 rounded-2xl text-base
+                         shadow-md shadow-orange-200 transition-colors"
             >
-              {loading ? 'Enviando pedido...' : `Hacer Pedido · $${subtotal.toFixed(2)}`}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                  </svg>
+                  Enviando pedido...
+                </span>
+              ) : (
+                `Hacer Pedido · $${subtotal.toFixed(2)}`
+              )}
             </button>
           </div>
         </form>
@@ -160,7 +187,8 @@ export default function OrderForm({ onSuccess, onCancel }) {
 }
 
 const inputClass = `w-full border border-gray-200 rounded-xl px-4 py-2.5 text-gray-900
-                    placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gold-400
+                    placeholder-gray-400 bg-white text-sm
+                    focus:outline-none focus:ring-2 focus:ring-orange-400
                     focus:border-transparent transition-shadow`;
 
 function Field({ label, children }) {

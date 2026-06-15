@@ -20,6 +20,7 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+  /* Legacy gradient kept for admin panel compatibility */
   .gold-gradient {
     background: linear-gradient(135deg, #d4a017 0%, #facc15 50%, #d4a017 100%);
   }

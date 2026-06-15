@@ -29,11 +29,9 @@ export default {
           900: '#0a0a0a',
         },
       },
-      fontFamily: {
-        display: ['Georgia', 'serif'],
-      },
       animation: {
         'slide-in':  'slideIn 0.3s ease-out',
+        'slide-up':  'slideUp 0.35s ease-out',
         'fade-in':   'fadeIn 0.4s ease-out',
         'bounce-in': 'bounceIn 0.35s ease-out',
       },
@@ -41,6 +39,10 @@ export default {
         slideIn: {
           from: { transform: 'translateX(100%)' },
           to:   { transform: 'translateX(0)' },
+        },
+        slideUp: {
+          from: { opacity: '0', transform: 'translateY(16px)' },
+          to:   { opacity: '1', transform: 'translateY(0)' },
         },
         fadeIn: {
           from: { opacity: '0', transform: 'translateY(8px)' },
