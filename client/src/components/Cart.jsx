@@ -8,34 +8,34 @@ export default function Cart({ onCheckout }) {
   return (
     <>
       {/* Overlay */}
-      <div className="fixed inset-0 bg-black/60 z-40 transition-opacity" onClick={closeCart} />
+      <div className="fixed inset-0 bg-black/70 z-40 transition-opacity" onClick={closeCart} />
 
       {/* Panel */}
       <aside className="fixed right-0 top-0 h-full w-full max-w-md bg-white z-50
                         flex flex-col shadow-2xl animate-slide-in">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 bg-white
-                        border-b border-gray-100">
+        <div className="flex items-center justify-between px-5 py-4 bg-brand-900
+                        border-b border-gold-600/30">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-              <svg className="w-4 h-4 text-orange-500" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round"
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h11M7 13L5.4 5M10 21a1 1 0 100-2 1 1 0 000 2zm7 0a1 1 0 100-2 1 1 0 000 2z"/>
-              </svg>
-            </div>
-            <span className="font-bold text-gray-900 text-base">Mi pedido</span>
+            <svg className="w-5 h-5 text-gold-400" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 6h11M7 13L5.4 5M10 21a1 1 0 100-2 1 1 0 000 2zm7 0a1 1 0 100-2 1 1 0 000 2z"/>
+            </svg>
+            <span className="font-bold text-white text-base">Mi pedido</span>
             {itemCount > 0 && (
-              <span className="bg-orange-500 text-white text-xs font-bold
+              <span className="bg-gold-500 text-brand-900 text-xs font-black
                                px-2 py-0.5 rounded-full min-w-[20px] text-center">
                 {itemCount}
               </span>
             )}
           </div>
           <button onClick={closeCart}
-            className="hover:bg-gray-100 p-2 rounded-xl transition-colors text-gray-400 hover:text-gray-600">
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            className="hover:bg-white/10 p-2 rounded-xl transition-colors
+                       text-gray-400 hover:text-white">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -59,14 +59,14 @@ export default function Cart({ onCheckout }) {
                 <li key={item.id}
                   className="flex gap-3 bg-gray-50 p-3 rounded-2xl border border-gray-100">
                   <img
-                    src={item.image_url || 'https://placehold.co/64x64/f97316/white?text=🍗'}
+                    src={item.image_url || 'https://placehold.co/64x64/111/d4a017?text=🍗'}
                     alt={item.name}
                     className="w-16 h-16 object-cover rounded-xl flex-shrink-0 bg-gray-200"
-                    onError={(e) => { e.target.src = 'https://placehold.co/64x64/f97316/white?text=🍗'; }}
+                    onError={(e) => { e.target.src = 'https://placehold.co/64x64/111111/d4a017?text=🍗'; }}
                   />
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-gray-900 text-sm truncate">{item.name}</p>
-                    <p className="text-orange-500 font-bold text-sm">${item.price.toFixed(0)}</p>
+                    <p className="text-brand-700 font-bold text-sm">${item.price.toFixed(0)}</p>
                     <div className="flex items-center gap-2 mt-1.5">
                       <button onClick={() => updateQty(item.id, item.quantity - 1)}
                         className="w-7 h-7 rounded-full bg-white border border-gray-200
@@ -117,9 +117,9 @@ export default function Cart({ onCheckout }) {
             </div>
             <button
               onClick={() => { closeCart(); onCheckout(); }}
-              className="w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700
-                         text-white font-bold py-4 rounded-2xl text-base
-                         shadow-md shadow-orange-200 transition-colors"
+              className="w-full gold-gradient text-brand-900 font-black
+                         py-4 rounded-2xl text-base shadow-lg shadow-gold-500/25
+                         hover:opacity-90 transition-opacity"
             >
               Confirmar Pedido · ${subtotal.toFixed(2)}
             </button>

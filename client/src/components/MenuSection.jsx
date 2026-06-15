@@ -30,7 +30,7 @@ export default function MenuSection() {
       .catch(() => { setError('Error al cargar productos.'); setLoading(false); });
   }, [activeCategory]);
 
-  // Load "Lo más pedido" — Boneless products (cat 4)
+  // Carga "Lo más pedido" (Boneless — cat 4) independiente del tab activo
   useEffect(() => {
     getProducts(4)
       .then(({ data }) => setFeatured(data.slice(0, 6)))
@@ -59,7 +59,9 @@ export default function MenuSection() {
           {/* Pollo Fresco */}
           {freshCats.length > 0 && (
             <div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5
+                            flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
                 Pollo Fresco
               </p>
               <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-0.5">
@@ -68,7 +70,7 @@ export default function MenuSection() {
                     className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5
                                 rounded-full font-semibold text-xs transition-all whitespace-nowrap
                                 ${activeCategory === cat.id
-                                  ? 'bg-green-600 text-white shadow-sm'
+                                  ? 'bg-green-700 text-white shadow-sm'
                                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
                     <span>{cat.emoji}</span><span>{cat.name}</span>
                   </button>
@@ -80,7 +82,9 @@ export default function MenuSection() {
           {/* Preparados */}
           {preparedCats.length > 0 && (
             <div>
-              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5
+                            flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-gold-500 rounded-full" />
                 Preparados
               </p>
               <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-0.5">
@@ -89,7 +93,7 @@ export default function MenuSection() {
                     className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-1.5
                                 rounded-full font-semibold text-xs transition-all whitespace-nowrap
                                 ${activeCategory === cat.id
-                                  ? 'bg-orange-500 text-white shadow-sm'
+                                  ? 'bg-brand-900 text-gold-400 shadow-sm'
                                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
                     <span>{cat.emoji}</span><span>{cat.name}</span>
                   </button>
@@ -123,7 +127,7 @@ export default function MenuSection() {
               <h3 className="font-bold text-gray-900 text-base">🔥 Lo más pedido</h3>
               <button
                 onClick={() => setActive(4)}
-                className="text-orange-500 hover:text-orange-600 text-sm font-semibold transition-colors">
+                className="text-gold-600 hover:text-gold-700 text-sm font-semibold transition-colors">
                 Ver todos →
               </button>
             </div>
@@ -188,14 +192,14 @@ function FeaturedCard({ product }) {
 
   return (
     <div className="flex-shrink-0 w-40 bg-white rounded-2xl shadow-sm border border-gray-100
-                    overflow-hidden hover:shadow-md transition-shadow animate-fade-in">
+                    overflow-hidden hover:shadow-md hover:border-gold-200 transition-all animate-fade-in">
       <div className="h-24 bg-gray-100 overflow-hidden">
         <img
-          src={product.image_url || 'https://placehold.co/160x96/f97316/white?text=🍗'}
+          src={product.image_url || 'https://placehold.co/160x96/111/d4a017?text=🍗'}
           alt={product.name}
           className="w-full h-full object-cover"
           loading="lazy"
-          onError={(e) => { e.target.src = 'https://placehold.co/160x96/f97316/white?text=🍗'; }}
+          onError={(e) => { e.target.src = 'https://placehold.co/160x96/111/d4a017?text=🍗'; }}
         />
       </div>
       <div className="p-2.5">
@@ -203,14 +207,15 @@ function FeaturedCard({ product }) {
           {product.name}
         </p>
         <div className="flex items-center justify-between mt-2">
-          <span className="text-gray-900 font-bold text-sm">
+          <span className="text-brand-900 font-bold text-sm">
             ${parseFloat(product.price).toFixed(0)}
           </span>
           <button
             onClick={handleAdd}
-            className="w-7 h-7 bg-orange-500 hover:bg-orange-600 active:bg-orange-700
-                       text-white rounded-full flex items-center justify-center
-                       transition-colors flex-shrink-0 shadow-sm">
+            className="w-7 h-7 bg-brand-900 hover:bg-brand-700 active:bg-black
+                       text-gold-400 rounded-full flex items-center justify-center
+                       transition-colors flex-shrink-0 border border-gold-600/30
+                       hover:border-gold-500/60">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />

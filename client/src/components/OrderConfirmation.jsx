@@ -32,7 +32,7 @@ export default function OrderConfirmation({ orderData, onClose }) {
             <p className="text-xs text-gray-400 mb-1 uppercase tracking-wide font-semibold">
               Tu número de pedido
             </p>
-            <p className="text-2xl font-black text-gray-900 tracking-wider">
+            <p className="text-2xl font-black text-brand-900 tracking-wider">
               {order.order_number}
             </p>
             <p className="text-xs text-gray-400 mt-1">Guárdalo para recoger en tienda</p>
@@ -52,7 +52,7 @@ export default function OrderConfirmation({ orderData, onClose }) {
             </div>
             <div className="border-t border-gray-100 pt-2.5 flex justify-between font-bold text-base">
               <span className="text-gray-900">Total</span>
-              <span className="text-orange-500">${parseFloat(order.total).toFixed(2)}</span>
+              <span className="text-brand-900">${parseFloat(order.total).toFixed(2)}</span>
             </div>
           </div>
 
@@ -60,9 +60,7 @@ export default function OrderConfirmation({ orderData, onClose }) {
           <div className="bg-green-50 border border-green-100 rounded-2xl p-3.5 flex gap-3 items-start">
             <div className="text-2xl flex-shrink-0">📲</div>
             <div>
-              <p className="text-sm font-semibold text-green-800">
-                Te avisamos cuando esté listo
-              </p>
+              <p className="text-sm font-semibold text-green-800">Te avisamos cuando esté listo</p>
               <p className="text-xs text-green-700 mt-0.5">
                 Recibirás un WhatsApp cuando tu pedido esté listo para recoger.
               </p>
@@ -82,11 +80,11 @@ export default function OrderConfirmation({ orderData, onClose }) {
         <div className="px-5 pb-5">
           <button
             onClick={handleClose}
-            className="w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700
-                       text-white font-bold py-3.5 rounded-2xl transition-colors
-                       shadow-sm text-base"
+            className="w-full gold-gradient text-brand-900 font-black
+                       py-3.5 rounded-2xl transition-opacity hover:opacity-90
+                       shadow-md shadow-gold-500/20 text-base"
           >
-            Volver al menú
+            Entendido — Volver al menú
           </button>
         </div>
       </div>

@@ -4,7 +4,7 @@ export default function Navbar() {
   const { itemCount, toggleCart } = useCart();
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-gray-100 shadow-sm">
+    <header className="sticky top-0 z-40 bg-brand-900 border-b border-gold-600/30 shadow-lg">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
 
         {/* Logo */}
@@ -12,14 +12,14 @@ export default function Navbar() {
           <img
             src="/fotos/logo.jpeg"
             alt="El Pollito Gus"
-            className="h-9 w-9 rounded-xl object-cover flex-shrink-0 shadow-sm"
+            className="h-9 w-9 rounded-xl object-cover flex-shrink-0 ring-2 ring-gold-500/60"
             onError={(e) => { e.target.style.display = 'none'; }}
           />
           <div className="min-w-0">
-            <div className="font-extrabold text-gray-900 text-[15px] leading-tight">
-              El Pollito <span className="text-orange-500">Gus</span>
+            <div className="font-extrabold text-white text-[15px] leading-tight">
+              El Pollito <span className="gold-text">Gus</span>
             </div>
-            <div className="text-gray-400 text-xs leading-tight hidden sm:block">
+            <div className="text-gold-500 text-xs leading-tight hidden sm:block">
               Pollo Fresco y Confiable
             </div>
           </div>
@@ -28,9 +28,10 @@ export default function Navbar() {
         {/* Cart button */}
         <button
           onClick={toggleCart}
-          className="relative flex items-center gap-2 bg-orange-500 hover:bg-orange-600
-                     active:bg-orange-700 text-white font-semibold px-4 py-2.5
-                     rounded-full transition-colors text-sm shadow-sm shadow-orange-200 flex-shrink-0"
+          className="relative flex items-center gap-2 gold-gradient
+                     text-brand-900 font-bold px-4 py-2.5
+                     rounded-full transition-opacity hover:opacity-90
+                     text-sm shadow-md shadow-gold-500/20 flex-shrink-0"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round"
@@ -38,10 +39,10 @@ export default function Navbar() {
           </svg>
           <span className="hidden sm:inline">Mi pedido</span>
           {itemCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 bg-gray-900 text-white
+            <span className="absolute -top-1.5 -right-1.5 bg-white text-brand-900
                              text-[10px] font-black w-5 h-5 rounded-full
                              flex items-center justify-center animate-bounce-in
-                             ring-2 ring-white">
+                             ring-2 ring-gold-500">
               {itemCount}
             </span>
           )}

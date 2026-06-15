@@ -29,34 +29,34 @@ export default function Home() {
       <div className="max-w-6xl mx-auto px-4 py-5">
         <div className="grid grid-cols-2 gap-3">
 
-          {/* Promo 1 — Boneless */}
+          {/* Promo 1 — Boneless / dorado */}
           <button
             onClick={scrollToMenu}
-            className="relative overflow-hidden bg-gradient-to-br from-orange-500 to-amber-400
-                       rounded-2xl p-4 text-left text-white hover:from-orange-600 hover:to-amber-500
-                       active:scale-95 transition-all shadow-sm text-sm">
-            <div className="absolute -right-3 -bottom-3 text-6xl opacity-20 pointer-events-none
-                            select-none">🍗</div>
-            <div className="font-extrabold leading-tight">Boneless</div>
-            <div className="text-orange-100 text-xs mt-0.5">3 sabores desde $80</div>
-            <span className="mt-3 inline-block bg-white/25 text-white text-xs font-bold
-                              px-2.5 py-0.5 rounded-full">
+            className="relative overflow-hidden gold-gradient rounded-2xl p-4
+                       text-left active:scale-95 transition-all shadow-md
+                       shadow-gold-500/20 text-sm">
+            <div className="absolute -right-3 -bottom-3 text-6xl opacity-20
+                            pointer-events-none select-none">🍗</div>
+            <div className="font-extrabold text-brand-900 leading-tight">Boneless</div>
+            <div className="text-brand-700 text-xs mt-0.5">3 sabores desde $80</div>
+            <span className="mt-3 inline-block bg-brand-900/15 text-brand-900
+                              text-xs font-bold px-2.5 py-0.5 rounded-full">
               ⭐ Favorito
             </span>
           </button>
 
-          {/* Promo 2 — Charolas */}
+          {/* Promo 2 — Charolas / oscuro */}
           <button
             onClick={scrollToMenu}
-            className="relative overflow-hidden bg-gradient-to-br from-red-600 to-rose-500
-                       rounded-2xl p-4 text-left text-white hover:from-red-700 hover:to-rose-600
-                       active:scale-95 transition-all shadow-sm text-sm">
-            <div className="absolute -right-3 -bottom-3 text-6xl opacity-20 pointer-events-none
-                            select-none">🫕</div>
-            <div className="font-extrabold leading-tight">Charola Grande</div>
-            <div className="text-red-100 text-xs mt-0.5">Para 4 personas · $390</div>
-            <span className="mt-3 inline-block bg-white/25 text-white text-xs font-bold
-                              px-2.5 py-0.5 rounded-full">
+            className="relative overflow-hidden bg-brand-900 border border-gold-600/30
+                       rounded-2xl p-4 text-left active:scale-95 transition-all
+                       shadow-md text-sm hover:border-gold-500/60">
+            <div className="absolute -right-3 -bottom-3 text-6xl opacity-10
+                            pointer-events-none select-none">🫕</div>
+            <div className="font-extrabold text-white leading-tight">Charola Grande</div>
+            <div className="text-gray-400 text-xs mt-0.5">Para 4 personas · $390</div>
+            <span className="mt-3 inline-block bg-gold-500/20 text-gold-400
+                              text-xs font-bold px-2.5 py-0.5 rounded-full">
               🔥 Popular
             </span>
           </button>
@@ -70,11 +70,13 @@ export default function Home() {
         <div className="fixed bottom-4 left-4 right-4 sm:hidden z-30 animate-slide-up">
           <button
             onClick={openCart}
-            className="w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700
-                       text-white font-bold py-4 rounded-2xl shadow-2xl shadow-orange-500/40
-                       flex items-center justify-between px-5 transition-colors"
+            className="w-full gold-gradient text-brand-900 font-black
+                       py-4 rounded-2xl shadow-2xl shadow-gold-500/40
+                       flex items-center justify-between px-5 transition-opacity
+                       hover:opacity-95"
           >
-            <span className="bg-white/20 text-white font-bold px-2.5 py-0.5 rounded-full text-sm">
+            <span className="bg-brand-900/15 text-brand-900 font-black
+                             px-2.5 py-0.5 rounded-full text-sm">
               {itemCount}
             </span>
             <span className="text-base">Ver mi pedido</span>
@@ -84,31 +86,32 @@ export default function Home() {
       )}
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white mt-10">
+      <footer className="bg-brand-900 text-gray-400 mt-10 border-t border-gold-600/20">
+        <div className="h-0.5 gold-gradient" />
         <div className="max-w-6xl mx-auto px-4 py-10 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             <img
               src="/fotos/logo.jpeg"
               alt="El Pollito Gus"
-              className="w-11 h-11 rounded-xl object-cover shadow-sm"
+              className="w-11 h-11 rounded-xl object-cover ring-2 ring-gold-600/40"
               onError={(e) => { e.target.style.display = 'none'; }}
             />
             <div className="text-left">
               <div className="font-bold text-white text-base">El Pollito Gus</div>
-              <div className="text-orange-400 text-xs">Pollo Fresco y Confiable</div>
+              <div className="text-gold-500 text-xs">Pollo Fresco y Confiable</div>
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-x-5 gap-y-1
-                          text-gray-500 text-sm mb-5">
+          <div className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-sm mb-5">
             <span>Boneless · Nuggets · Tenders · Palomitas</span>
             <span>💳 Tarjetas de crédito y débito bienvenidas</span>
           </div>
 
-          <div className="flex justify-center gap-3 mb-5">
+          <div className="flex justify-center gap-2 mb-5">
             {['🔥 Natural', '🍋 Limón', '🌶️ Buffalo'].map(s => (
               <span key={s}
-                className="bg-gray-800 text-gray-400 text-xs px-3 py-1.5 rounded-full">
+                className="bg-brand-800 border border-gold-600/20 text-gray-500
+                           text-xs px-3 py-1.5 rounded-full">
                 {s}
               </span>
             ))}
