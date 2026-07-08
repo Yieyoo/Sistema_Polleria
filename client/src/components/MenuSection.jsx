@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { getCategories, getProducts } from '../services/api.js';
 import ProductCard from './ProductCard.jsx';
 
-// Categorías de pollo fresco (ids 1-3)
-const FRESH_IDS = [1, 2, 3];
+// Categorías de pollo fresco
+const FRESH_IDS = [1, 2, 3, 10, 11];
 
 export default function MenuSection() {
   const [categories,     setCategories]   = useState([]);

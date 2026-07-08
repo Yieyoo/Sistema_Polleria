@@ -3,16 +3,18 @@
 // ─────────────────────────────────────────────
 export const CATEGORIES = [
   // Pollo Fresco
-  { id: 1, name: 'Pechuga de Pollo',  description: 'Preparada a tu gusto',              emoji: '🫀', sort_order: 1 },
-  { id: 2, name: 'Pierna y Muslo',    description: 'Fajitas, alambre, bistec y más',    emoji: '🍗', sort_order: 2 },
-  { id: 3, name: 'Alitas de Pollo',   description: 'Frescas y de calidad',              emoji: '🐔', sort_order: 3 },
+  { id: 1,  name: 'Pechuga de Pollo',  description: 'Bisteces, fajitas, alambre, molida y más', emoji: '🫀', sort_order: 1 },
+  { id: 2,  name: 'Pierna y Muslo',    description: 'Fajitas, alambre, bistec, piezas y molidos', emoji: '🍗', sort_order: 2 },
+  { id: 3,  name: 'Piernas de Pollo',  description: 'Piernas solas, frescas y de calidad',        emoji: '🦵', sort_order: 3 },
+  { id: 10, name: 'Alitas de Pollo',   description: 'Alitas solas, frescas y de calidad',         emoji: '🐔', sort_order: 4 },
+  { id: 11, name: 'Retazo de Pollo',   description: 'Con alas o sin alas, precio por kg',         emoji: '🐓', sort_order: 5 },
   // Preparados
-  { id: 4, name: 'Boneless',          description: 'Natural · Limón · Buffalo',          emoji: '🔥', sort_order: 4 },
-  { id: 5, name: 'Nuggets & Palomitas', description: 'Crujientes y deliciosos',          emoji: '⭐', sort_order: 5 },
-  { id: 6, name: "Tender's",          description: 'Tiras de pollo empanizadas',         emoji: '🍖', sort_order: 6 },
-  { id: 7, name: 'Papas',             description: 'Papa Gajo y Papa Recta',             emoji: '🍟', sort_order: 7 },
-  { id: 8, name: 'Empanadas & Burger',description: 'Empanadas y Hamburguesas',           emoji: '🍔', sort_order: 8 },
-  { id: 9, name: 'Charolas',          description: 'Combos para compartir',              emoji: '🫕', sort_order: 9 },
+  { id: 4, name: 'Boneless',          description: 'Natural · Limón · Buffalo',          emoji: '🔥', sort_order: 6 },
+  { id: 5, name: 'Nuggets & Palomitas', description: 'Crujientes y deliciosos',          emoji: '⭐', sort_order: 7 },
+  { id: 6, name: "Tender's",          description: 'Tiras de pollo empanizadas',         emoji: '🍖', sort_order: 8 },
+  { id: 7, name: 'Papas',             description: 'Papa Gajo y Papa Recta',             emoji: '🍟', sort_order: 9 },
+  { id: 8, name: 'Empanadas & Burger',description: 'Empanadas y Hamburguesas',           emoji: '🍔', sort_order: 10 },
+  { id: 9, name: 'Charolas',          description: 'Combos para compartir',              emoji: '🫕', sort_order: 11 },
 ];
 
 // ─────────────────────────────────────────────
@@ -128,19 +130,39 @@ export const PRODUCTS = [
     available: true, sort_order: 5,
   },
 
+  // ══ PIERNAS DE POLLO ══════════════════════
+  {
+    id: 14, category_id: 3, category_name: 'Piernas de Pollo', category_emoji: '🦵',
+    name: 'Piernas de Pollo',
+    description: 'Piernas solas, frescas de pollo amarillo. Precio por kg.',
+    price: '00.00',
+    image_url: 'https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?w=500&q=80',
+    available: true, sort_order: 1,
+  },
+
   // ══ ALITAS DE POLLO ═══════════════════════
   {
-    id: 14, category_id: 3, category_name: 'Alitas de Pollo', category_emoji: '🐔',
+    id: 15, category_id: 10, category_name: 'Alitas de Pollo', category_emoji: '🐔',
     name: 'Alitas de Pollo',
-    description: 'Alitas frescas de pollo amarillo. Perfectas para asar, freír o guisar.',
+    description: 'Alitas solas, frescas de pollo amarillo. Precio por kg.',
     price: '00.00',
     image_url: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=500&q=80',
     available: true, sort_order: 1,
   },
+
+  // ══ RETAZO DE POLLO ═══════════════════════
   {
-    id: 15, category_id: 3, category_name: 'Alitas de Pollo', category_emoji: '🐔',
-    name: 'Piernas de Pollo',
-    description: 'Piernas frescas de pollo amarillo. Calidad garantizada.',
+    id: 32, category_id: 11, category_name: 'Retazo de Pollo', category_emoji: '🐓',
+    name: 'Retazo con Alas',
+    description: 'Retazo de pollo fresco con alas incluidas. Ideal para caldos y guisos.',
+    price: '00.00',
+    image_url: 'https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?w=500&q=80',
+    available: true, sort_order: 1,
+  },
+  {
+    id: 33, category_id: 11, category_name: 'Retazo de Pollo', category_emoji: '🐓',
+    name: 'Retazo sin Alas',
+    description: 'Retazo de pollo fresco sin alas. Perfecto para sopas y caldos.',
     price: '00.00',
     image_url: 'https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?w=500&q=80',
     available: true, sort_order: 2,
