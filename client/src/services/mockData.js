@@ -28,7 +28,7 @@ export const PRODUCTS = [
     name: 'Pechuga — 4 Bisteces',
     description: 'Pechuga fresca en 4 bisteces. Lista para cocer a tu gusto.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=500&q=80',
+    image_url: '/fotos/pechuga.jpg',
     available: true, sort_order: 1,
   },
   {
@@ -36,7 +36,7 @@ export const PRODUCTS = [
     name: 'Pechuga — 6 Bisteces',
     description: 'Pechuga fresca en 6 bisteces. Lista para cocer a tu gusto.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=500&q=80',
+    image_url: '/fotos/pechuga.jpg',
     available: true, sort_order: 2,
   },
   {
@@ -44,7 +44,7 @@ export const PRODUCTS = [
     name: 'Pechuga — 8 Bisteces',
     description: 'Pechuga fresca en 8 bisteces. Lista para cocer a tu gusto.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=500&q=80',
+    image_url: '/fotos/pechuga.jpg',
     available: true, sort_order: 3,
   },
   {
@@ -52,7 +52,7 @@ export const PRODUCTS = [
     name: 'Pechuga — 10 Bisteces',
     description: 'Pechuga fresca en 10 bisteces. Lista para cocer a tu gusto.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=500&q=80',
+    image_url: '/fotos/pechuga.jpg',
     available: true, sort_order: 4,
   },
   {
@@ -60,7 +60,7 @@ export const PRODUCTS = [
     name: 'Pechuga en Fajitas',
     description: 'Pechuga fresca cortada en fajitas. Ideal para tacos y platillos.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=500&q=80',
+    image_url: '/fotos/pechuga.jpg',
     available: true, sort_order: 5,
   },
   {
@@ -68,7 +68,7 @@ export const PRODUCTS = [
     name: 'Pechuga para Alambre',
     description: 'Pechuga fresca cortada para alambre. Cuadritos perfectos.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=500&q=80',
+    image_url: '/fotos/pechuga.jpg',
     available: true, sort_order: 6,
   },
   {
@@ -76,7 +76,7 @@ export const PRODUCTS = [
     name: 'Pechuga Molida',
     description: 'Pechuga de pollo molida fresca. Lista para guisos y rellenos.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=500&q=80',
+    image_url: '/fotos/pechuga.jpg',
     available: true, sort_order: 7,
   },
   {
@@ -84,7 +84,7 @@ export const PRODUCTS = [
     name: 'Pechuga para Cocer (entera)',
     description: 'Pechuga entera fresca para cocer. Perfecta para caldos y hervidos.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=500&q=80',
+    image_url: '/fotos/pechuga.jpg',
     available: true, sort_order: 8,
   },
 
@@ -94,7 +94,7 @@ export const PRODUCTS = [
     name: 'Pierna y Muslo — Piezas Enteras',
     description: 'Pierna y muslo frescos, piezas enteras. Pollo amarillo de primera.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?w=500&q=80',
+    image_url: '/fotos/pierna-muslo.jpg',
     available: true, sort_order: 1,
   },
   {
@@ -102,7 +102,7 @@ export const PRODUCTS = [
     name: 'Pierna y Muslo — Bistec',
     description: 'Pierna y muslo abiertos en bistec. Listos para la sartén o asador.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?w=500&q=80',
+    image_url: '/fotos/pierna-muslo.jpg',
     available: true, sort_order: 2,
   },
   {
@@ -110,7 +110,7 @@ export const PRODUCTS = [
     name: 'Pierna y Muslo — Fajitas',
     description: 'Pierna y muslo cortados en fajitas. Perfectos para tacos y guisos.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?w=500&q=80',
+    image_url: '/fotos/pierna-muslo.jpg',
     available: true, sort_order: 3,
   },
   {
@@ -118,7 +118,7 @@ export const PRODUCTS = [
     name: 'Pierna y Muslo — Alambre',
     description: 'Pierna y muslo en cubos para alambre. Sabor inigualable.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?w=500&q=80',
+    image_url: '/fotos/pierna-muslo.jpg',
     available: true, sort_order: 4,
   },
   {
@@ -126,7 +126,7 @@ export const PRODUCTS = [
     name: 'Molidos de Pierna y Muslo',
     description: 'Pierna y muslo molidos frescos. Ideal para albóndigas y rellenos.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?w=500&q=80',
+    image_url: '/fotos/pierna-muslo.jpg',
     available: true, sort_order: 5,
   },
 
@@ -136,7 +136,7 @@ export const PRODUCTS = [
     name: 'Piernas de Pollo',
     description: 'Piernas solas, frescas de pollo amarillo. Precio por kg.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?w=500&q=80',
+    image_url: '/fotos/piernas.jpg',
     available: true, sort_order: 1,
   },
 
@@ -146,7 +146,7 @@ export const PRODUCTS = [
     name: 'Alitas de Pollo',
     description: 'Alitas solas, frescas de pollo amarillo. Precio por kg.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=500&q=80',
+    image_url: '/fotos/alitas.jpg',
     available: true, sort_order: 1,
   },
 
@@ -156,7 +156,7 @@ export const PRODUCTS = [
     name: 'Retazo con Alas',
     description: 'Retazo de pollo fresco con alas incluidas. Ideal para caldos y guisos.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?w=500&q=80',
+    image_url: '/fotos/retazo.jpg',
     available: true, sort_order: 1,
   },
   {
@@ -164,7 +164,7 @@ export const PRODUCTS = [
     name: 'Retazo sin Alas',
     description: 'Retazo de pollo fresco sin alas. Perfecto para sopas y caldos.',
     price: '00.00',
-    image_url: 'https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?w=500&q=80',
+    image_url: '/fotos/retazo.jpg',
     available: true, sort_order: 2,
   },
 
