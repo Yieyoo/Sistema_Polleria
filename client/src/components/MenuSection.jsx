@@ -7,6 +7,7 @@ const FRESH_IDS = [1, 2, 3, 10, 11];
 export default function MenuSection() {
   const [categories,       setCategories]       = useState([]);
   const [freshByCategory,  setFreshByCategory]  = useState({});
+  const [openFreshCat,     setOpenFreshCat]     = useState(null);
   const [activePrepared,   setActivePrepared]   = useState(null);
   const [preparedProducts, setPreparedProducts] = useState([]);
   const [loadingPrepared,  setLoadingPrepared]  = useState(false);
@@ -16,8 +17,6 @@ export default function MenuSection() {
     getCategories()
       .then(async ({ data }) => {
         setCategories(data);
-
-        // Carga todos los productos frescos de golpe
         const freshCats = data
           .filter(c => FRESH_IDS.includes(c.id))
           .sort((a, b) => a.sort_order - b.sort_order);
@@ -27,8 +26,6 @@ export default function MenuSection() {
           results[cat.id] = prods;
         }
         setFreshByCategory(results);
-
-        // Primera categoría preparada activa
         const firstPrep = data.find(c => !FRESH_IDS.includes(c.id));
         if (firstPrep) setActivePrepared(firstPrep.id);
       })
@@ -43,8 +40,10 @@ export default function MenuSection() {
       .catch(() => setLoadingPrepared(false));
   }, [activePrepared]);
 
-  const freshCats   = categories.filter(c =>  FRESH_IDS.includes(c.id)).sort((a, b) => a.sort_order - b.sort_order);
+  const freshCats    = categories.filter(c =>  FRESH_IDS.includes(c.id)).sort((a, b) => a.sort_order - b.sort_order);
   const preparedCats = categories.filter(c => !FRESH_IDS.includes(c.id));
+
+  const toggleFresh = (id) => setOpenFreshCat(prev => prev === id ? null : id);
 
   if (error) return (
     <div className="text-center py-16 text-gray-500">
@@ -61,11 +60,8 @@ export default function MenuSection() {
         <p className="text-gray-500 mt-1">Selecciona un producto y agrégalo al carrito</p>
       </div>
 
-      {/* ═══════════════════════════════════════
-          POLLO FRESCO — todas las categorías
-      ═══════════════════════════════════════ */}
+      {/* ══ POLLO FRESCO ══ */}
       <div className="mb-14">
-        {/* Encabezado sección */}
         <div className="flex items-center gap-3 mb-5">
           <div className="h-px flex-1 bg-gradient-to-r from-transparent to-green-200" />
           <span className="flex items-center gap-2 text-sm font-bold text-green-700 uppercase tracking-widest">
@@ -75,59 +71,62 @@ export default function MenuSection() {
           <div className="h-px flex-1 bg-gradient-to-l from-transparent to-green-200" />
         </div>
 
-        {/* Nota precio */}
-        <div className="mb-6 bg-green-50 border border-green-200 rounded-xl px-4 py-3
+        <div className="mb-4 bg-green-50 border border-green-200 rounded-xl px-4 py-3
                         flex items-start gap-2 text-sm text-green-800">
           <span className="text-lg">📞</span>
           <div>
             <span className="font-semibold">Precio por kg.</span>
             {' '}Indica en las notas del pedido la cantidad que necesitas.
-            Los precios pueden variar según el corte.
           </div>
         </div>
 
-        {/* Categorías y sus productos */}
-        <div className="space-y-10">
-          {freshCats.map(cat => (
-            <div key={cat.id}>
-              {/* Título de categoría */}
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl">{cat.emoji}</span>
-                <div>
-                  <h3 className="font-extrabold text-brand-900 text-lg leading-tight">{cat.name}</h3>
-                  <p className="text-gray-400 text-xs">{cat.description}</p>
-                </div>
-                <div className="h-px flex-1 bg-gray-100 ml-2" />
-              </div>
-
-              {/* Productos */}
-              {!freshByCategory[cat.id] ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="bg-white rounded-2xl shadow-sm overflow-hidden animate-pulse">
-                      <div className="h-36 bg-gray-200" />
-                      <div className="p-3 space-y-2">
-                        <div className="h-3 bg-gray-200 rounded w-3/4" />
-                        <div className="h-3 bg-gray-100 rounded w-full" />
-                      </div>
+        {/* Acordeón de categorías frescas */}
+        <div className="space-y-3">
+          {freshCats.map(cat => {
+            const isOpen = openFreshCat === cat.id;
+            const products = freshByCategory[cat.id] || [];
+            return (
+              <div key={cat.id} className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+                {/* Cabecera clickeable */}
+                <button
+                  onClick={() => toggleFresh(cat.id)}
+                  className="w-full flex items-center justify-between px-5 py-4 text-left
+                             hover:bg-green-50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{cat.emoji}</span>
+                    <div>
+                      <p className="font-bold text-brand-900 text-base">{cat.name}</p>
+                      <p className="text-gray-400 text-xs">{cat.description}</p>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {freshByCategory[cat.id].map(p => (
-                    <ProductCard key={p.id} product={p} isFresh={true} />
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+                  </div>
+                  <span className={`text-green-600 text-xl font-bold transition-transform duration-200
+                                   ${isOpen ? 'rotate-45' : ''}`}>
+                    +
+                  </span>
+                </button>
+
+                {/* Productos desplegables */}
+                {isOpen && (
+                  <div className="border-t border-gray-100 px-5 py-5 bg-gray-50">
+                    {products.length === 0 ? (
+                      <p className="text-gray-400 text-sm">Cargando...</p>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {products.map(p => (
+                          <ProductCard key={p.id} product={p} isFresh={true} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* ═══════════════════════════════════════
-          PREPARADOS — tabs como antes
-      ═══════════════════════════════════════ */}
+      {/* ══ PREPARADOS ══ */}
       <div>
         <div className="flex items-center gap-3 mb-4">
           <div className="h-px flex-1 bg-gradient-to-r from-transparent to-gray-200" />
