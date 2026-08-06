@@ -80,9 +80,9 @@ function GroupedProductList({ products }) {
       {sections.map((sec, si) => (
         <div key={si}>
           {sec.groupName && (
-            <div className="flex items-center gap-2 px-4 pt-3 pb-1">
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{sec.groupName}</span>
-              <div className="flex-1 h-px bg-gray-200" />
+            <div className="flex items-center gap-3 px-4 py-2 bg-brand-900 mt-1">
+              <div className="w-1 h-4 rounded-full bg-gold-400" />
+              <span className="text-xs font-extrabold text-gold-400 uppercase tracking-widest">{sec.groupName}</span>
             </div>
           )}
           {sec.items.map(p => (
