@@ -166,7 +166,7 @@ export const PRODUCTS = [
 
   // ══ ESPECIALIDADES ════════════════════════
   { id: 34, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
-    name: 'Nuggets de Pollo', short_name: 'Nuggets', group: null, unit: '250 g aprox.',
+    name: 'Nuggets de Pollo 🦕', short_name: 'Nuggets 🦕', group: null, unit: '250 g aprox.',
     description: '100% pechuga, crujientes por fuera y jugosos por dentro.',
     price: '70.00', image_url: 'https://images.unsplash.com/photo-1619881590738-a111d176d906?w=500&q=80',
     available: true, sort_order: 1 },
