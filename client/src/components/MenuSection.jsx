@@ -59,6 +59,101 @@ function FreshProductRow({ product, catName, isFresh }) {
   );
 }
 
+const PRESENTACIONES = ['Entera', 'Bistec', 'Fajitas', 'Alambre', 'Molida'];
+
+function CombinadoSelector() {
+  const { addItem, openCart } = useCart();
+  const [piernas, setPiernas] = useState({ qty: 1, pres: 'Entera' });
+  const [muslos,  setMuslos]  = useState({ qty: 1, pres: 'Entera' });
+
+  const handleAdd = () => {
+    const p = piernas.qty > 0 ? `${piernas.qty} Pierna${piernas.qty > 1 ? 's' : ''} ${piernas.pres}` : '';
+    const m = muslos.qty  > 0 ? `${muslos.qty} Muslo${muslos.qty   > 1 ? 's' : ''} ${muslos.pres}`   : '';
+    const label = [p, m].filter(Boolean).join(' + ');
+    addItem({
+      id: `comb-${Date.now()}`,
+      product_id: `comb-${Date.now()}`,
+      name: `Combinado: ${label}`,
+      price: 0,
+      image_url: '/fotos/pierna-muslo.jpg',
+    });
+    openCart();
+  };
+
+  const Stepper = ({ value, onChange }) => (
+    <div className="flex items-center gap-1.5">
+      <button onClick={() => onChange(Math.max(0, value - 1))}
+        className="w-7 h-7 rounded-lg bg-brand-900 text-gold-400 font-bold text-base flex items-center justify-center border border-gold-600/30 leading-none">
+        −
+      </button>
+      <span className="w-5 text-center font-bold text-brand-900 text-sm">{value}</span>
+      <button onClick={() => onChange(Math.min(30, value + 1))}
+        className="w-7 h-7 rounded-lg bg-brand-900 text-gold-400 font-bold text-base flex items-center justify-center border border-gold-600/30 leading-none">
+        +
+      </button>
+    </div>
+  );
+
+  const PresChips = ({ value, onChange, disabled }) => (
+    <div className="flex flex-wrap gap-1 mt-1.5">
+      {PRESENTACIONES.map(p => (
+        <button key={p} onClick={() => !disabled && onChange(p)}
+          className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border transition-colors
+            ${disabled ? 'opacity-30 cursor-default bg-white text-gray-400 border-gray-200'
+              : value === p
+                ? 'bg-brand-900 text-gold-400 border-gold-600/30'
+                : 'bg-white text-gray-600 border-gray-200 hover:border-brand-400'}`}>
+          {p}
+        </button>
+      ))}
+    </div>
+  );
+
+  return (
+    <div>
+      <div className="flex items-center justify-center gap-3 px-4 py-1.5 bg-brand-900 mt-1">
+        <div className="w-1 h-3 rounded-full bg-gold-400" />
+        <span className="text-xs font-extrabold text-gold-400 uppercase tracking-widest">Combinado</span>
+        <div className="w-1 h-3 rounded-full bg-gold-400" />
+      </div>
+
+      <div className="px-4 py-3 space-y-3">
+        {/* Piernas */}
+        <div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-bold text-brand-900">Piernas</span>
+            <Stepper value={piernas.qty} onChange={qty => setPiernas(p => ({ ...p, qty }))} />
+          </div>
+          <PresChips value={piernas.pres} onChange={pres => setPiernas(p => ({ ...p, pres }))} disabled={piernas.qty === 0} />
+        </div>
+
+        <div className="h-px bg-gray-200" />
+
+        {/* Muslos */}
+        <div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-bold text-brand-900">Muslos</span>
+            <Stepper value={muslos.qty} onChange={qty => setMuslos(p => ({ ...p, qty }))} />
+          </div>
+          <PresChips value={muslos.pres} onChange={pres => setMuslos(p => ({ ...p, pres }))} disabled={muslos.qty === 0} />
+        </div>
+
+        <button onClick={handleAdd}
+          disabled={piernas.qty === 0 && muslos.qty === 0}
+          className="w-full flex items-center justify-center gap-2 bg-brand-900 hover:bg-brand-700
+                     disabled:opacity-40 disabled:cursor-not-allowed
+                     text-gold-400 font-bold py-2.5 rounded-xl transition-colors border border-gold-600/30">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          Agregar combinado
+        </button>
+        <p className="text-center text-xs text-gray-400 pb-1">Precio por kg — se calcula en tienda</p>
+      </div>
+    </div>
+  );
+}
+
 function GroupedProductList({ products, isFresh = false, catName = '' }) {
   const { addItem, openCart } = useCart();
 
@@ -235,7 +330,10 @@ export default function MenuSection() {
                       {products.length === 0 ? (
                         <p className="text-gray-400 text-sm px-4 py-3">Cargando...</p>
                       ) : (
-                        <GroupedProductList products={products} isFresh={isFresh} catName={cat.name} />
+                        <>
+                          <GroupedProductList products={products} isFresh={isFresh} catName={cat.name} />
+                          {cat.id === 2 && <CombinadoSelector />}
+                        </>
                       )}
                     </div>
                   </div>
