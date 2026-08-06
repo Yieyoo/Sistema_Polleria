@@ -185,7 +185,12 @@ export default function MenuSection() {
             const imgSrc   = CATEGORY_IMAGES[cat.id] || '/fotos/logo.jpeg';
 
             return (
-              <div key={cat.id} className="rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-white">
+              <div key={cat.id}
+                className={`rounded-2xl overflow-hidden bg-white transition-all duration-300
+                            ${isOpen
+                              ? 'shadow-lg shadow-black/20 ring-2 ring-gold-400/60 scale-[1.01]'
+                              : 'shadow-sm border border-gray-200'}`}>
+
                 {/* Cabecera con imagen de fondo */}
                 <button
                   onClick={() => toggleFresh(cat.id)}
@@ -194,35 +199,46 @@ export default function MenuSection() {
                   <img
                     src={imgSrc}
                     alt={cat.name}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className={`absolute inset-0 w-full h-full object-cover transition-transform duration-500
+                                ${isOpen ? 'scale-105' : 'scale-100'}`}
                     onError={(e) => { e.target.style.display = 'none'; }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-black/20" />
+                  <div className={`absolute inset-0 transition-all duration-300
+                                   ${isOpen
+                                     ? 'bg-gradient-to-r from-black/85 via-black/60 to-black/30'
+                                     : 'bg-gradient-to-r from-black/75 via-black/50 to-black/20'}`} />
                   <div className="relative z-10 flex items-center justify-between w-full px-4 pb-4 pt-0">
                     <div>
                       <p className="font-extrabold text-white text-base leading-tight drop-shadow">{cat.name}</p>
-                      <p className="text-white/70 text-xs">
+                      <p className={`text-xs transition-colors duration-300
+                                    ${isOpen ? 'text-gold-400' : 'text-white/70'}`}>
                         {products.length > 0 ? `${products.length} opciones` : cat.description}
                       </p>
                     </div>
-                    <svg className={`w-5 h-5 text-white drop-shadow transition-transform duration-200
-                                    ${isOpen ? 'rotate-180' : ''}`}
+                    <svg className={`w-5 h-5 drop-shadow transition-all duration-300
+                                    ${isOpen ? 'rotate-180 text-gold-400' : 'text-white'}`}
                       fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                     </svg>
                   </div>
                 </button>
 
-                {/* Lista de sub-productos */}
-                {isOpen && (
-                  <div className="bg-gray-50 border-t border-gray-100">
-                    {products.length === 0 ? (
-                      <p className="text-gray-400 text-sm px-4 py-3">Cargando...</p>
-                    ) : (
-                      <GroupedProductList products={products} isFresh={isFresh} catName={cat.name} />
-                    )}
+                {/* Lista de sub-productos — slide con grid trick */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateRows: isOpen ? '1fr' : '0fr',
+                  transition: 'grid-template-rows 300ms ease'
+                }}>
+                  <div style={{ overflow: 'hidden' }}>
+                    <div className="bg-gray-50 border-t border-gray-100">
+                      {products.length === 0 ? (
+                        <p className="text-gray-400 text-sm px-4 py-3">Cargando...</p>
+                      ) : (
+                        <GroupedProductList products={products} isFresh={isFresh} catName={cat.name} />
+                      )}
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
             );
           })}
