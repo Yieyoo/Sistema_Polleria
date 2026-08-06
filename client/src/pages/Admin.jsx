@@ -663,10 +663,8 @@ function ManualOrderForm({ onCreated }) {
         </div>
         <div className="p-4 grid sm:grid-cols-2 gap-3">
           {[
-            { key: 'name',       label: 'Nombre *',      placeholder: 'Nombre completo' },
-            { key: 'phone',      label: 'Teléfono *',    placeholder: '10 dígitos' },
-            { key: 'address',    label: 'Dirección',     placeholder: 'Calle y número' },
-            { key: 'references', label: 'Referencias',   placeholder: 'Entre calles, color de casa…' },
+            { key: 'name',  label: 'Nombre *',   placeholder: 'Nombre completo' },
+            { key: 'phone', label: 'Teléfono *', placeholder: '10 dígitos' },
           ].map(f => (
             <div key={f.key}>
               <label className="block text-xs font-bold text-gray-400 mb-1">{f.label}</label>
