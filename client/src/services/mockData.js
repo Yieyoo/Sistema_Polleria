@@ -4,7 +4,7 @@
 export const CATEGORIES = [
   // Pollo Fresco
   { id: 1,  name: 'Pechuga de Pollo',  description: 'Bisteces, fajitas, alambre, molida y más', emoji: '🫀', sort_order: 1 },
-  { id: 2,  name: 'Pierna y Muslo',    description: 'Bistec, fajitas, alambre, piezas y molidos', emoji: '🍗', sort_order: 2 },
+  { id: 2,  name: 'Pierna y Muslo',    description: 'Arma tu combinado a la medida', emoji: '🍗', sort_order: 2 },
   { id: 10, name: 'Alitas de Pollo',   description: 'Alitas solas, frescas y de calidad',         emoji: '🐔', sort_order: 3 },
   { id: 11, name: 'Retazo de Pollo',   description: 'Con alas o sin alas, precio por kg',         emoji: '🐓', sort_order: 5 },
   // Especialidades (acordeón)
@@ -56,47 +56,7 @@ export const PRODUCTS = [
     description: 'Pechuga entera fresca para cocer.',
     price: '00.00', image_url: '/fotos/pechuga.jpg', available: true, sort_order: 8 },
 
-  // ══ PIERNA Y MUSLO ════════════════════════
-  { id: 9,  category_id: 2, category_name: 'Pierna y Muslo', category_emoji: '🍗',
-    name: 'Pierna — Piezas Enteras', group: 'Pierna',
-    description: 'Pierna fresca entera. Pollo amarillo de primera.',
-    price: '00.00', image_url: '/fotos/pierna-muslo.jpg', available: true, sort_order: 1 },
-  { id: 10, category_id: 2, category_name: 'Pierna y Muslo', category_emoji: '🍗',
-    name: 'Pierna — Bistec', group: 'Pierna',
-    description: 'Pierna abierta en bistec. Lista para sartén o asador.',
-    price: '00.00', image_url: '/fotos/pierna-muslo.jpg', available: true, sort_order: 2 },
-  { id: 11, category_id: 2, category_name: 'Pierna y Muslo', category_emoji: '🍗',
-    name: 'Pierna — Fajitas', group: 'Pierna',
-    description: 'Pierna cortada en fajitas. Perfecta para tacos y guisos.',
-    price: '00.00', image_url: '/fotos/pierna-muslo.jpg', available: true, sort_order: 3 },
-  { id: 12, category_id: 2, category_name: 'Pierna y Muslo', category_emoji: '🍗',
-    name: 'Pierna — Alambre', group: 'Pierna',
-    description: 'Pierna en cubos para alambre.',
-    price: '00.00', image_url: '/fotos/pierna-muslo.jpg', available: true, sort_order: 4 },
-  { id: 13, category_id: 2, category_name: 'Pierna y Muslo', category_emoji: '🍗',
-    name: 'Pierna — Molida', group: 'Pierna',
-    description: 'Pierna molida fresca. Ideal para albóndigas y rellenos.',
-    price: '00.00', image_url: '/fotos/pierna-muslo.jpg', available: true, sort_order: 5 },
-  { id: 47, category_id: 2, category_name: 'Pierna y Muslo', category_emoji: '🍗',
-    name: 'Muslo — Piezas Enteras', group: 'Muslo',
-    description: 'Muslo fresco entero. Pollo amarillo de primera.',
-    price: '00.00', image_url: '/fotos/pierna-muslo.jpg', available: true, sort_order: 6 },
-  { id: 48, category_id: 2, category_name: 'Pierna y Muslo', category_emoji: '🍗',
-    name: 'Muslo — Bistec', group: 'Muslo',
-    description: 'Muslo abierto en bistec.',
-    price: '00.00', image_url: '/fotos/pierna-muslo.jpg', available: true, sort_order: 7 },
-  { id: 49, category_id: 2, category_name: 'Pierna y Muslo', category_emoji: '🍗',
-    name: 'Muslo — Fajitas', group: 'Muslo',
-    description: 'Muslo cortado en fajitas.',
-    price: '00.00', image_url: '/fotos/pierna-muslo.jpg', available: true, sort_order: 8 },
-  { id: 50, category_id: 2, category_name: 'Pierna y Muslo', category_emoji: '🍗',
-    name: 'Muslo — Alambre', group: 'Muslo',
-    description: 'Muslo en cubos para alambre.',
-    price: '00.00', image_url: '/fotos/pierna-muslo.jpg', available: true, sort_order: 9 },
-  { id: 51, category_id: 2, category_name: 'Pierna y Muslo', category_emoji: '🍗',
-    name: 'Muslo — Molida', group: 'Muslo',
-    description: 'Muslo molido fresco.',
-    price: '00.00', image_url: '/fotos/pierna-muslo.jpg', available: true, sort_order: 10 },
+  // ══ PIERNA Y MUSLO — solo combinado (sin productos sueltos) ══
 
   // ══ ALITAS DE POLLO ═══════════════════════
   {

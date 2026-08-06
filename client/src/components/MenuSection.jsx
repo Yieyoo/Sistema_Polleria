@@ -110,46 +110,49 @@ function CombinadoSelector() {
   );
 
   return (
-    <div>
-      <div className="flex items-center justify-center gap-3 px-4 py-1.5 bg-brand-900 mt-1">
-        <div className="w-1 h-3 rounded-full bg-gold-400" />
-        <span className="text-xs font-extrabold text-gold-400 uppercase tracking-widest">Combinado</span>
-        <div className="w-1 h-3 rounded-full bg-gold-400" />
+    <div className="px-4 pt-4 pb-2 space-y-3">
+      {/* Encabezado */}
+      <div className="flex items-center gap-2 pb-1 border-b border-gray-100">
+        <img src="/fotos/pierna-muslo.jpg" alt=""
+          className="w-8 h-8 rounded-lg object-cover shrink-0 ring-1 ring-gray-200"
+          onError={e => { e.target.style.display = 'none'; }} />
+        <div>
+          <p className="text-sm font-extrabold text-brand-900 leading-tight">Pierna y Muslo</p>
+          <p className="text-xs text-gray-400">Elige cuántas piezas y en qué presentación</p>
+        </div>
       </div>
 
-      <div className="px-4 py-3 space-y-3">
-        {/* Piernas */}
-        <div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-brand-900">Piernas</span>
-            <Stepper value={piernas.qty} onChange={qty => setPiernas(p => ({ ...p, qty }))} />
-          </div>
-          <PresChips value={piernas.pres} onChange={pres => setPiernas(p => ({ ...p, pres }))} disabled={piernas.qty === 0} />
+      {/* Piernas */}
+      <div>
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-bold text-brand-900">Piernas</span>
+          <Stepper value={piernas.qty} onChange={qty => setPiernas(p => ({ ...p, qty }))} />
         </div>
-
-        <div className="h-px bg-gray-200" />
-
-        {/* Muslos */}
-        <div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-brand-900">Muslos</span>
-            <Stepper value={muslos.qty} onChange={qty => setMuslos(p => ({ ...p, qty }))} />
-          </div>
-          <PresChips value={muslos.pres} onChange={pres => setMuslos(p => ({ ...p, pres }))} disabled={muslos.qty === 0} />
-        </div>
-
-        <button onClick={handleAdd}
-          disabled={piernas.qty === 0 && muslos.qty === 0}
-          className="w-full flex items-center justify-center gap-2 bg-brand-900 hover:bg-brand-700
-                     disabled:opacity-40 disabled:cursor-not-allowed
-                     text-gold-400 font-bold py-2.5 rounded-xl transition-colors border border-gold-600/30">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          Agregar combinado
-        </button>
-        <p className="text-center text-xs text-gray-400 pb-1">Precio por kg — se calcula en tienda</p>
+        <PresChips value={piernas.pres} onChange={pres => setPiernas(p => ({ ...p, pres }))} disabled={piernas.qty === 0} />
       </div>
+
+      <div className="h-px bg-gray-200" />
+
+      {/* Muslos */}
+      <div>
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-bold text-brand-900">Muslos</span>
+          <Stepper value={muslos.qty} onChange={qty => setMuslos(p => ({ ...p, qty }))} />
+        </div>
+        <PresChips value={muslos.pres} onChange={pres => setMuslos(p => ({ ...p, pres }))} disabled={muslos.qty === 0} />
+      </div>
+
+      <button onClick={handleAdd}
+        disabled={piernas.qty === 0 && muslos.qty === 0}
+        className="w-full flex items-center justify-center gap-2 bg-brand-900 hover:bg-brand-700
+                   disabled:opacity-40 disabled:cursor-not-allowed
+                   text-gold-400 font-bold py-2.5 rounded-xl transition-colors border border-gold-600/30">
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        Agregar al carrito
+      </button>
+      <p className="text-center text-xs text-gray-400 pb-1">Precio por kg — se calcula en tienda</p>
     </div>
   );
 }
@@ -327,13 +330,12 @@ export default function MenuSection() {
                 }}>
                   <div style={{ overflow: 'hidden' }}>
                     <div className="bg-gray-50 border-t border-gray-100">
-                      {products.length === 0 ? (
+                      {!(cat.id in freshByCategory) ? (
                         <p className="text-gray-400 text-sm px-4 py-3">Cargando...</p>
+                      ) : cat.id === 2 ? (
+                        <CombinadoSelector />
                       ) : (
-                        <>
-                          <GroupedProductList products={products} isFresh={isFresh} catName={cat.name} />
-                          {cat.id === 2 && <CombinadoSelector />}
-                        </>
+                        <GroupedProductList products={products} isFresh={isFresh} catName={cat.name} />
                       )}
                     </div>
                   </div>
