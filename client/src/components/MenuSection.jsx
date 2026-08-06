@@ -34,22 +34,24 @@ function FreshProductRow({ product, catName, isFresh }) {
     openCart();
   };
   return (
-    <div className="flex items-center justify-between px-4 py-2
+    <div className="flex items-center gap-2 px-4 py-1.5
                     border-b border-gray-100 last:border-0 hover:bg-white transition-colors">
-      <div className="flex-1 min-w-0 pr-3">
-        <p className="font-semibold text-brand-900 text-sm leading-tight">
-          {isFresh ? shortName(product.name, catName) : product.name}
+      <p className="flex-1 font-semibold text-brand-900 text-sm truncate">
+        {isFresh ? shortName(product.name, catName) : product.name}
+      </p>
+      {isFresh ? (
+        <span className="text-green-700 text-xs font-semibold w-14 text-right shrink-0">por kg</span>
+      ) : (
+        <p className="text-brand-900 font-bold text-sm w-14 text-right shrink-0">
+          ${parseFloat(product.price).toFixed(2)}
         </p>
-        {!isFresh && (
-          <p className="text-brand-900 font-bold text-sm">${parseFloat(product.price).toFixed(2)}</p>
-        )}
-      </div>
+      )}
       <button
         onClick={handleAdd}
         className="flex-shrink-0 flex items-center justify-center bg-brand-900 hover:bg-brand-700
-                   text-gold-400 w-8 h-8 rounded-lg transition-colors border border-gold-600/30"
+                   text-gold-400 w-7 h-7 rounded-lg transition-colors border border-gold-600/30"
       >
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
         </svg>
       </button>
@@ -80,25 +82,26 @@ function GroupedProductList({ products }) {
       {sections.map((sec, si) => (
         <div key={si}>
           {sec.groupName && (
-            <div className="flex items-center gap-3 px-4 py-2 bg-brand-900 mt-1">
-              <div className="w-1 h-4 rounded-full bg-gold-400" />
+            <div className="flex items-center justify-center gap-3 px-4 py-1.5 bg-brand-900 mt-1">
+              <div className="w-1 h-3 rounded-full bg-gold-400" />
               <span className="text-xs font-extrabold text-gold-400 uppercase tracking-widest">{sec.groupName}</span>
+              <div className="w-1 h-3 rounded-full bg-gold-400" />
             </div>
           )}
           {sec.items.map(p => (
             <div key={p.id}
-              className="flex items-center justify-between px-4 py-2
+              className="flex items-center gap-2 px-4 py-1.5
                          border-b border-gray-100 last:border-0 hover:bg-white transition-colors">
-              <div className="flex-1 min-w-0 pr-3">
-                <p className="font-semibold text-brand-900 text-sm leading-tight">
-                  {p.short_name || p.name}
-                </p>
-                <p className="text-brand-900 font-bold text-sm">${parseFloat(p.price).toFixed(2)}</p>
-              </div>
+              <p className="flex-1 font-semibold text-brand-900 text-sm truncate">
+                {p.short_name || p.name}
+              </p>
+              <p className="text-brand-900 font-bold text-sm w-14 text-right shrink-0">
+                ${parseFloat(p.price).toFixed(2)}
+              </p>
               <button onClick={() => handleAdd(p)}
                 className="flex-shrink-0 flex items-center justify-center bg-brand-900 hover:bg-brand-700
-                           text-gold-400 w-8 h-8 rounded-lg transition-colors border border-gold-600/30">
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                           text-gold-400 w-7 h-7 rounded-lg transition-colors border border-gold-600/30">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
               </button>
