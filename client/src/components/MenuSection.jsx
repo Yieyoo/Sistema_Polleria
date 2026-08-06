@@ -329,9 +329,10 @@ function EspecialidadesSelector({ products }) {
             return (
               <div key={p.id}
                 className="flex items-center gap-2 px-4 py-2 border-b border-gray-100 last:border-0 hover:bg-white transition-colors">
-                <p className="flex-1 font-semibold text-brand-900 text-sm truncate">
-                  {p.short_name || p.name}
-                </p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-brand-900 text-sm truncate">{p.short_name || p.name}</p>
+                  {p.unit && <p className="text-xs text-gray-400 leading-tight">{p.unit}</p>}
+                </div>
                 <span className="text-brand-900 font-bold text-sm w-12 text-right shrink-0">
                   ${parseFloat(p.price).toFixed(0)}
                 </span>
