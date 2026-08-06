@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getCategories, getProducts } from '../services/api.js';
 import { useCart } from '../context/CartContext.jsx';
-import ProductCard from './ProductCard.jsx';
 
 const FRESH_IDS    = [1, 2, 3, 10, 11];
 const ACCORDION_IDS = [1, 2, 3, 10, 11, 12];
@@ -117,10 +116,7 @@ export default function MenuSection() {
   const [categories,       setCategories]       = useState([]);
   const [freshByCategory,  setFreshByCategory]  = useState({});
   const [openFreshCat,     setOpenFreshCat]     = useState(null);
-  const [activePrepared,   setActivePrepared]   = useState(null);
-  const [preparedProducts, setPreparedProducts] = useState([]);
-  const [loadingPrepared,  setLoadingPrepared]  = useState(false);
-  const [error,            setError]            = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     getCategories()
@@ -133,22 +129,11 @@ export default function MenuSection() {
           results[cat.id] = prods;
         }
         setFreshByCategory(results);
-        const firstPrep = data.find(c => !FRESH_IDS.includes(c.id));
-        if (firstPrep) setActivePrepared(firstPrep.id);
       })
       .catch(() => setError('No se pudieron cargar las categorías.'));
   }, []);
 
-  useEffect(() => {
-    if (!activePrepared) return;
-    setLoadingPrepared(true);
-    getProducts(activePrepared)
-      .then(({ data }) => { setPreparedProducts(data); setLoadingPrepared(false); })
-      .catch(() => setLoadingPrepared(false));
-  }, [activePrepared]);
-
-  const freshCats    = categories.filter(c =>  ACCORDION_IDS.includes(c.id)).sort((a, b) => a.sort_order - b.sort_order);
-  const preparedCats = categories.filter(c => !ACCORDION_IDS.includes(c.id));
+  const freshCats = categories.filter(c => ACCORDION_IDS.includes(c.id)).sort((a, b) => a.sort_order - b.sort_order);
 
   const toggleFresh = (id) => setOpenFreshCat(prev => prev === id ? null : id);
 
@@ -243,48 +228,6 @@ export default function MenuSection() {
         </div>
       </div>
 
-      {/* ══ PREPARADOS ══ */}
-      <div>
-        <div className="flex items-center gap-3 mb-4">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent to-gray-200" />
-          <span className="flex items-center gap-2 text-xs font-bold text-gray-400 uppercase tracking-widest">
-            <span className="w-2 h-2 bg-gold-500 rounded-full" />
-            Preparados
-          </span>
-          <div className="h-px flex-1 bg-gradient-to-l from-transparent to-gray-200" />
-        </div>
-
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2 mb-6">
-          {preparedCats.map(cat => (
-            <button key={cat.id} onClick={() => setActivePrepared(cat.id)}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full
-                          font-semibold text-sm transition-all whitespace-nowrap border
-                          ${activePrepared === cat.id
-                            ? 'bg-brand-900 text-gold-400 border-gold-500/50 shadow-md'
-                            : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 shadow-sm'}`}>
-              <span>{cat.emoji}</span><span>{cat.name}</span>
-            </button>
-          ))}
-        </div>
-
-        {loadingPrepared ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl shadow-sm overflow-hidden animate-pulse">
-                <div className="h-44 bg-gray-200" />
-                <div className="p-4 space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-3/4" />
-                  <div className="h-3 bg-gray-100 rounded w-full" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {preparedProducts.map(p => <ProductCard key={p.id} product={p} isFresh={false} />)}
-          </div>
-        )}
-      </div>
     </section>
   );
 }
