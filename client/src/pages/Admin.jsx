@@ -119,24 +119,21 @@ export default function Admin() {
     <div className="min-h-screen bg-gray-100">
 
       {/* ── Header ── */}
-      <header className="bg-brand-900 px-4 sm:px-8 h-16 flex items-center justify-between gap-4">
+      <header className="bg-brand-900 px-3 sm:px-8 h-14 flex items-center gap-2">
         {/* Logo */}
-        <div className="flex items-center gap-3 shrink-0">
-          <img src="/fotos/logo.jpeg" alt="logo"
-            className="w-9 h-9 rounded-full object-cover ring-2 ring-gold-400/40"
-            onError={e => { e.target.style.display = 'none'; }} />
-          <span className="font-extrabold text-white text-base tracking-tight hidden sm:inline">El Pollito Gus</span>
-        </div>
+        <img src="/fotos/logo.jpeg" alt="logo"
+          className="w-8 h-8 rounded-full object-cover ring-2 ring-gold-400/40 shrink-0"
+          onError={e => { e.target.style.display = 'none'; }} />
 
-        {/* Nav tabs */}
-        <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+        {/* Nav tabs — centrado, scrollable en móvil */}
+        <nav className="flex-1 flex items-center gap-1 overflow-x-auto scrollbar-hide">
           {[
             { id: 'pedidos',   label: 'Pedidos' },
             { id: 'resumen',   label: 'Resumen' },
             { id: 'productos', label: 'Productos' },
           ].map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all
                 ${activeTab === tab.id
                   ? 'bg-gold-400 text-brand-900 shadow-sm'
                   : 'text-white/70 hover:text-white hover:bg-white/10'}`}>
@@ -146,10 +143,7 @@ export default function Admin() {
         </nav>
 
         {/* Acciones */}
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="hidden md:inline text-gold-400/70 text-xs font-semibold">
-            {adminUser.full_name || 'Administrador'}
-          </span>
+        <div className="flex items-center gap-1 shrink-0">
           <button onClick={load}
             className="p-2 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-colors"
             title="Actualizar">
@@ -159,42 +153,27 @@ export default function Admin() {
             </svg>
           </button>
           <button onClick={logout}
-            className="flex items-center gap-1.5 border border-white/20 hover:border-white/40 hover:bg-white/10
-                       text-white text-xs font-semibold px-3 py-2 rounded-xl transition-all">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            className="p-2 rounded-xl text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+            title="Cerrar sesión">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round"
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
             </svg>
-            <span className="hidden sm:inline">Cerrar sesión</span>
           </button>
         </div>
       </header>
 
       {/* ── Hero ── */}
-      <div className="bg-brand-900 px-4 sm:px-8 pt-6 pb-16">
+      <div className="bg-brand-900 px-4 sm:px-8 pt-5 pb-6">
         <p className="text-gold-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Panel de Control</p>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
           {activeTab === 'pedidos' ? 'Gestión de Pedidos' : activeTab === 'resumen' ? 'Resumen del Día' : 'Catálogo de Productos'}
         </h1>
-        <p className="text-white/50 text-sm mt-1">{formatDateLong()} · Actualización automática cada 30 s</p>
-      </div>
-
-      {/* ── KPI Cards (overlap hero) ── */}
-      <div className="-mt-10 px-4 sm:px-8 max-w-5xl mx-auto">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          <KpiCard icon="📋" label="Pedidos hoy"  value={summary?.total_orders  ?? '—'} accent="gray" />
-          <KpiCard icon="⏳" label="Pendientes"   value={summary?.pending        ?? '—'} accent="amber" />
-          <KpiCard icon="👨‍🍳" label="Preparando" value={summary?.preparing      ?? '—'} accent="blue" />
-          <KpiCard icon="🛵" label="En camino"   value={summary?.on_the_way     ?? '—'} accent="orange" />
-          <KpiCard icon="✅" label="Entregados"  value={summary?.delivered       ?? '—'} accent="green" />
-          <KpiCard icon="💰" label="Ingresos del día"
-            value={summary ? `$${parseFloat(summary.total_revenue || 0).toFixed(0)}` : '—'}
-            accent="gold" />
-        </div>
+        <p className="text-white/50 text-sm mt-1">{formatDateLong()}</p>
       </div>
 
       {/* ── Main ── */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-8 py-6 space-y-4">
+      <main className="max-w-5xl mx-auto px-4 sm:px-8 py-5 space-y-4">
 
         {/* ── Vista: Resumen ── */}
         {activeTab === 'resumen' && summary && (
