@@ -191,7 +191,7 @@ export const PRODUCTS = [
     price: '90.00', image_url: 'https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?w=500&q=80',
     available: true, sort_order: 5 },
   { id: 38, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
-    name: 'Tenders Buffalo', short_name: 'Buffalo 🔥', group: 'Tenders', unit: '500 g aprox.',
+    name: 'Tenders Spicy 🔥', short_name: 'Spicy 🔥', group: 'Tenders', unit: '500 g aprox.',
     description: 'Tiras de pollo con salsa buffalo picante.',
     price: '95.00', image_url: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=500&q=80',
     available: true, sort_order: 6 },
