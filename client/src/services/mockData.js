@@ -8,9 +8,8 @@ export const CATEGORIES = [
   { id: 3,  name: 'Piernas de Pollo',  description: 'Piernas solas, frescas y de calidad',        emoji: '🦵', sort_order: 3 },
   { id: 10, name: 'Alitas de Pollo',   description: 'Alitas solas, frescas y de calidad',         emoji: '🐔', sort_order: 4 },
   { id: 11, name: 'Retazo de Pollo',   description: 'Con alas o sin alas, precio por kg',         emoji: '🐓', sort_order: 5 },
-  // Especialidades y Papas (acordeón)
-  { id: 12, name: 'Especialidades',   description: 'Nuggets · Palomitas · Tenders · Boneless · Empanizados · Burger', emoji: '🔥', sort_order: 6 },
-  { id: 13, name: 'Papas',           description: 'Papa Gajo y Papa Recta',             emoji: '🍟', sort_order: 7 },
+  // Especialidades (acordeón)
+  { id: 12, name: 'Especialidades', description: 'Nuggets · Palomitas · Tenders · Boneless · Papas y más', emoji: '🔥', sort_order: 6 },
   // Solo Charolas en tab
   { id: 9, name: 'Charolas',          description: 'Combos para compartir',              emoji: '🫕', sort_order: 8 },
 ];
@@ -333,16 +332,16 @@ export const PRODUCTS = [
     available: true, sort_order: 10 },
 
   // ══ PAPAS ═════════════════════════════════
-  { id: 44, category_id: 13, category_name: 'Papas', category_emoji: '🍟',
-    name: 'Papa Gajo', short_name: 'Gajo', group: null,
+  { id: 44, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
+    name: 'Papa Gajo', short_name: 'Gajo', group: 'Papas',
     description: 'Gajos de papa sazonados, crujientes por fuera.',
     price: '45.00', image_url: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500&q=80',
-    available: true, sort_order: 1 },
-  { id: 45, category_id: 13, category_name: 'Papas', category_emoji: '🍟',
-    name: 'Papa Recta', short_name: 'Recta', group: null,
+    available: true, sort_order: 11 },
+  { id: 45, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
+    name: 'Papa Recta', short_name: 'Recta', group: 'Papas',
     description: 'Papas fritas clásicas bien doradas.',
     price: '40.00', image_url: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500&q=80',
-    available: true, sort_order: 2 },
+    available: true, sort_order: 12 },
 
   // ══ CHAROLAS ══════════════════════════════
   {
