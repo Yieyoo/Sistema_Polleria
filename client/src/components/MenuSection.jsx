@@ -31,14 +31,13 @@ function FreshProductRow({ product }) {
       </div>
       <button
         onClick={handleAdd}
-        className="flex-shrink-0 flex items-center gap-1 bg-brand-900 hover:bg-brand-700
-                   text-gold-400 font-bold text-sm px-4 py-2 rounded-xl transition-colors
+        className="flex-shrink-0 flex items-center justify-center bg-brand-900 hover:bg-brand-700
+                   text-gold-400 font-bold w-9 h-9 rounded-xl transition-colors
                    border border-gold-600/30"
       >
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
         </svg>
-        Agregar
       </button>
     </div>
   );
@@ -140,19 +139,17 @@ export default function MenuSection() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/50 to-black/20" />
                   <div className="relative z-10 flex items-center justify-between w-full px-4 pb-4 pt-0">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl drop-shadow">{cat.emoji}</span>
-                      <div>
-                        <p className="font-extrabold text-white text-base leading-tight drop-shadow">{cat.name}</p>
-                        <p className="text-white/70 text-xs">
-                          {products.length > 0 ? `${products.length} opciones` : cat.description}
-                        </p>
-                      </div>
+                    <div>
+                      <p className="font-extrabold text-white text-base leading-tight drop-shadow">{cat.name}</p>
+                      <p className="text-white/70 text-xs">
+                        {products.length > 0 ? `${products.length} opciones` : cat.description}
+                      </p>
                     </div>
-                    <span className={`text-white text-2xl font-light transition-transform duration-200 drop-shadow
-                                     ${isOpen ? 'rotate-45' : ''}`}>
-                      +
-                    </span>
+                    <svg className={`w-5 h-5 text-white drop-shadow transition-transform duration-200
+                                    ${isOpen ? 'rotate-180' : ''}`}
+                      fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
                   </div>
                 </button>
 
