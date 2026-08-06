@@ -14,7 +14,18 @@ const FRESH_IMAGES = {
   11: '/fotos/retazo.jpg',
 };
 
-function FreshProductRow({ product }) {
+function shortName(name, catName) {
+  if (name.includes(' — ')) return name.split(' — ')[1];
+  const firstWord = catName.split(' ')[0];
+  // quitar sufijo "de [Categoria]..."
+  const noSuffix = name.replace(new RegExp(`\\s+de\\s+${firstWord}.*`, 'i'), '');
+  if (noSuffix !== name) return noSuffix;
+  // quitar prefijo "[Categoria] (de Pollo|en|para|con|sin)?"
+  const stripped = name.replace(new RegExp(`^${firstWord}\\s+(de\\s+Pollo\\s+|en\\s+|para\\s+)?`, 'i'), '');
+  return stripped || name;
+}
+
+function FreshProductRow({ product, catName }) {
   const { addItem, openCart } = useCart();
   const handleAdd = () => {
     addItem({ id: product.id, name: product.name, price: parseFloat(product.price),
@@ -22,20 +33,17 @@ function FreshProductRow({ product }) {
     openCart();
   };
   return (
-    <div className="flex items-center justify-between px-4 py-3
+    <div className="flex items-center justify-between px-4 py-2
                     border-b border-gray-100 last:border-0 hover:bg-white transition-colors">
-      <div className="flex-1 min-w-0 pr-3">
-        <p className="font-semibold text-brand-900 text-sm leading-tight">{product.name}</p>
-        <span className="inline-block mt-0.5 text-green-700 text-xs font-medium
-                         bg-green-50 px-2 py-0.5 rounded-full">Precio por kg</span>
-      </div>
+      <p className="font-semibold text-brand-900 text-sm leading-tight flex-1 min-w-0 pr-3">
+        {shortName(product.name, catName)}
+      </p>
       <button
         onClick={handleAdd}
         className="flex-shrink-0 flex items-center justify-center bg-brand-900 hover:bg-brand-700
-                   text-gold-400 font-bold w-9 h-9 rounded-xl transition-colors
-                   border border-gold-600/30"
+                   text-gold-400 w-8 h-8 rounded-lg transition-colors border border-gold-600/30"
       >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
         </svg>
       </button>
@@ -159,7 +167,7 @@ export default function MenuSection() {
                     {products.length === 0 ? (
                       <p className="text-gray-400 text-sm px-4 py-3">Cargando...</p>
                     ) : (
-                      products.map(p => <FreshProductRow key={p.id} product={p} />)
+                      products.map(p => <FreshProductRow key={p.id} product={p} catName={cat.name} />)
                     )}
                   </div>
                 )}
