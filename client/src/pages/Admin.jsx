@@ -342,6 +342,7 @@ export default function Admin() {
                 products={products}
                 onToggle={(id, val) => handleProductField(id, 'available', val)}
                 onPriceChange={(id, val) => handleProductField(id, 'price', val)}
+                onStockChange={(id, val) => handleProductField(id, 'stock', val)}
               />
             )}
           </div>
@@ -549,11 +550,33 @@ function OrderDetailModal({ order, onClose, onStatusChange }) {
 
 // ── Product Table ─────────────────────────────────────────────────────────────
 
-function ProductTable({ products, onToggle, onPriceChange }) {
-  const [editing, setEditing] = useState(null);
-  const [tempPrice, setTempPrice] = useState('');
+function Toggle({ on, onChange }) {
+  return (
+    <button
+      onClick={() => onChange(!on)}
+      style={{
+        position: 'relative', flexShrink: 0,
+        width: 44, height: 24, borderRadius: 999,
+        backgroundColor: on ? '#22c55e' : '#d1d5db',
+        border: 'none', cursor: 'pointer',
+        transition: 'background-color .2s',
+      }}>
+      <span style={{
+        position: 'absolute', top: 2,
+        left: on ? 22 : 2, width: 20, height: 20,
+        borderRadius: 999, backgroundColor: '#fff',
+        boxShadow: '0 1px 3px rgba(0,0,0,.25)',
+        transition: 'left .2s', display: 'block',
+      }} />
+    </button>
+  );
+}
 
-  // Agrupar por categoría
+function ProductTable({ products, onToggle, onPriceChange, onStockChange }) {
+  const [subtab,    setSubtab]    = useState('precios');
+  const [editing,   setEditing]   = useState(null);
+  const [tempVal,   setTempVal]   = useState('');
+
   const byCat = products.reduce((acc, p) => {
     const key = p.category_name || 'Sin categoría';
     if (!acc[key]) acc[key] = [];
@@ -561,22 +584,45 @@ function ProductTable({ products, onToggle, onPriceChange }) {
     return acc;
   }, {});
 
-  const startEdit = (p) => {
-    setEditing(p.id);
-    setTempPrice(String(p.price));
-  };
+  const startEdit = (id, current) => { setEditing(id); setTempVal(String(current ?? '')); };
 
   const commitEdit = (p) => {
-    const val = parseFloat(tempPrice);
-    if (!isNaN(val) && val >= 0) onPriceChange(p.id, val);
+    const val = parseFloat(tempVal);
+    if (!isNaN(val) && val >= 0) {
+      subtab === 'precios' ? onPriceChange(p.id, val) : onStockChange(p.id, Math.round(val));
+    }
     setEditing(null);
   };
 
+  const isPrice = subtab === 'precios';
+
   return (
     <div className="space-y-4">
+      {/* Sub-tabs */}
+      <div className="flex gap-2 bg-white rounded-2xl shadow-sm p-1.5">
+        {[
+          { id: 'precios',    label: '💲 Precios' },
+          { id: 'cantidades', label: '📦 Cantidades' },
+        ].map(t => (
+          <button key={t.id} onClick={() => { setSubtab(t.id); setEditing(null); }}
+            className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all
+              ${subtab === t.id
+                ? 'bg-brand-900 text-gold-400 shadow-sm'
+                : 'text-gray-500 hover:bg-gray-100'}`}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {subtab === 'cantidades' && (
+        <p className="text-xs text-gray-400 text-center -mt-2">
+          Indica cuántas piezas/kg tienes disponibles hoy. Pon <strong>0</strong> para desactivar.
+        </p>
+      )}
+
       {Object.entries(byCat).map(([cat, items]) => (
         <div key={cat} className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-4 py-3 bg-brand-900 flex items-center gap-2">
+          <div className="px-4 py-2.5 bg-brand-900 flex items-center gap-2">
             <span className="font-bold text-white text-sm">{cat}</span>
             <span className="text-gold-400/60 text-xs">{items.length} productos</span>
           </div>
@@ -584,17 +630,10 @@ function ProductTable({ products, onToggle, onPriceChange }) {
             {items.map(p => (
               <div key={p.id}
                 className={`flex items-center gap-3 px-4 py-3 transition-colors
-                  ${!p.available ? 'bg-gray-50 opacity-60' : ''}`}>
-                {/* Toggle disponibilidad */}
-                <button
-                  onClick={() => onToggle(p.id, !p.available)}
-                  className={`relative w-10 h-5.5 shrink-0 rounded-full transition-colors duration-200
-                    ${p.available ? 'bg-green-500' : 'bg-gray-300'}`}
-                  style={{ minWidth: '2.5rem', height: '1.375rem' }}
-                  title={p.available ? 'Disponible — clic para desactivar' : 'No disponible — clic para activar'}>
-                  <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200
-                    ${p.available ? 'translate-x-5' : 'translate-x-0.5'}`} />
-                </button>
+                  ${!p.available ? 'opacity-50' : ''}`}>
+
+                {/* Toggle */}
+                <Toggle on={!!p.available} onChange={val => onToggle(p.id, val)} />
 
                 {/* Nombre */}
                 <div className="flex-1 min-w-0">
@@ -602,29 +641,29 @@ function ProductTable({ products, onToggle, onPriceChange }) {
                   {p.unit && <p className="text-xs text-gray-400">{p.unit}</p>}
                 </div>
 
-                {/* Precio editable */}
+                {/* Campo editable: precio o cantidad */}
                 <div className="shrink-0">
                   {editing === p.id ? (
                     <div className="flex items-center gap-1">
-                      <span className="text-gray-400 text-sm">$</span>
+                      {isPrice && <span className="text-gray-400 text-sm">$</span>}
                       <input
-                        type="number"
-                        min="0"
-                        step="1"
-                        value={tempPrice}
-                        onChange={e => setTempPrice(e.target.value)}
+                        type="number" min="0" step={isPrice ? '1' : '1'}
+                        value={tempVal}
+                        onChange={e => setTempVal(e.target.value)}
                         onBlur={() => commitEdit(p)}
                         onKeyDown={e => { if (e.key === 'Enter') commitEdit(p); if (e.key === 'Escape') setEditing(null); }}
                         className="w-20 border border-brand-400 rounded-xl px-2 py-1 text-sm font-bold
                                    focus:outline-none focus:ring-2 focus:ring-brand-400 text-right"
-                        autoFocus
-                      />
+                        autoFocus />
                     </div>
                   ) : (
-                    <button onClick={() => startEdit(p)}
+                    <button
+                      onClick={() => startEdit(p.id, isPrice ? p.price : (p.stock ?? ''))}
                       className="flex items-center gap-1 group px-2 py-1 rounded-xl hover:bg-gray-100 transition-colors">
                       <span className="font-bold text-gray-900 text-sm">
-                        ${parseFloat(p.price || 0).toFixed(0)}
+                        {isPrice
+                          ? `$${parseFloat(p.price || 0).toFixed(0)}`
+                          : (p.stock != null ? `${p.stock} pz` : '— pz')}
                       </span>
                       <svg className="w-3 h-3 text-gray-300 group-hover:text-brand-500 transition-colors"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
