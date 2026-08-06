@@ -8,13 +8,11 @@ export const CATEGORIES = [
   { id: 3,  name: 'Piernas de Pollo',  description: 'Piernas solas, frescas y de calidad',        emoji: '🦵', sort_order: 3 },
   { id: 10, name: 'Alitas de Pollo',   description: 'Alitas solas, frescas y de calidad',         emoji: '🐔', sort_order: 4 },
   { id: 11, name: 'Retazo de Pollo',   description: 'Con alas o sin alas, precio por kg',         emoji: '🐓', sort_order: 5 },
-  // Preparados
-  { id: 4, name: 'Boneless',          description: 'Natural · Limón · Buffalo',          emoji: '🔥', sort_order: 6 },
-  { id: 5, name: 'Nuggets & Palomitas', description: 'Crujientes y deliciosos',          emoji: '⭐', sort_order: 7 },
-  { id: 6, name: "Tender's",          description: 'Tiras de pollo empanizadas',         emoji: '🍖', sort_order: 8 },
-  { id: 7, name: 'Papas',             description: 'Papa Gajo y Papa Recta',             emoji: '🍟', sort_order: 9 },
-  { id: 8, name: 'Empanadas & Burger',description: 'Empanadas y Hamburguesas',           emoji: '🍔', sort_order: 10 },
-  { id: 9, name: 'Charolas',          description: 'Combos para compartir',              emoji: '🫕', sort_order: 11 },
+  // Especialidades y Papas (acordeón)
+  { id: 12, name: 'Especialidades',   description: 'Nuggets · Palomitas · Tenders · Boneless · Empanizados · Burger', emoji: '🔥', sort_order: 6 },
+  { id: 13, name: 'Papas',           description: 'Papa Gajo y Papa Recta',             emoji: '🍟', sort_order: 7 },
+  // Solo Charolas en tab
+  { id: 9, name: 'Charolas',          description: 'Combos para compartir',              emoji: '🫕', sort_order: 8 },
 ];
 
 // ─────────────────────────────────────────────
@@ -280,6 +278,106 @@ export const PRODUCTS = [
     price: '95.00',
     image_url: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=80',
     available: true, sort_order: 3,
+  },
+
+  // ══ ESPECIALIDADES ════════════════════════
+  {
+    id: 34, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
+    name: 'Nuggets de Pollo',
+    description: '100% pechuga, crujientes por fuera y jugosos por dentro.',
+    price: '70.00',
+    image_url: 'https://images.unsplash.com/photo-1619881590738-a111d176d906?w=500&q=80',
+    available: true, sort_order: 1,
+  },
+  {
+    id: 35, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
+    name: 'Palomitas de Pollo',
+    description: 'Pequeños bocados de pollo empanizado, perfectos para botanear.',
+    price: '70.00',
+    image_url: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c2?w=500&q=80',
+    available: true, sort_order: 2,
+  },
+  {
+    id: 36, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
+    name: "Tenders Natural",
+    description: 'Tiras de pechuga empanizadas, crujientes y jugosas.',
+    price: '90.00',
+    image_url: 'https://images.unsplash.com/photo-1501200291289-c5a76c232e5f?w=500&q=80',
+    available: true, sort_order: 3,
+  },
+  {
+    id: 37, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
+    name: "Tenders Limón",
+    description: 'Tiras de pollo bañadas en salsa de limón con chile.',
+    price: '90.00',
+    image_url: 'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=500&q=80',
+    available: true, sort_order: 4,
+  },
+  {
+    id: 38, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
+    name: "Tenders Buffalo",
+    description: 'Tiras de pollo con salsa buffalo picante.',
+    price: '95.00',
+    image_url: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=500&q=80',
+    available: true, sort_order: 5,
+  },
+  {
+    id: 39, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
+    name: 'Boneless Natural',
+    description: 'Trozos de pollo sin hueso, empanizados y fritos. Sabor original.',
+    price: '80.00',
+    image_url: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=500&q=80',
+    available: true, sort_order: 6,
+  },
+  {
+    id: 40, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
+    name: 'Boneless Limón',
+    description: 'Boneless bañados en salsa de limón con un toque picosito.',
+    price: '80.00',
+    image_url: 'https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=500&q=80',
+    available: true, sort_order: 7,
+  },
+  {
+    id: 41, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
+    name: 'Boneless Buffalo',
+    description: 'Boneless con salsa buffalo picante y ahumada.',
+    price: '85.00',
+    image_url: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=500&q=80',
+    available: true, sort_order: 8,
+  },
+  {
+    id: 42, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
+    name: 'Empanizados (x3)',
+    description: 'Empanadas rellenas de pollo deshebrado con condimentos especiales.',
+    price: '95.00',
+    image_url: 'https://images.unsplash.com/photo-1619881590738-a111d176d906?w=500&q=80',
+    available: true, sort_order: 9,
+  },
+  {
+    id: 43, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
+    name: 'Hamburguesa de Pollo',
+    description: 'Filete de pollo empanizado con lechuga, tomate y aderezo en pan brioche.',
+    price: '95.00',
+    image_url: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=80',
+    available: true, sort_order: 10,
+  },
+
+  // ══ PAPAS ═════════════════════════════════
+  {
+    id: 44, category_id: 13, category_name: 'Papas', category_emoji: '🍟',
+    name: 'Papa Gajo',
+    description: 'Gajos de papa sazonados, crujientes por fuera y suaves por dentro.',
+    price: '45.00',
+    image_url: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500&q=80',
+    available: true, sort_order: 1,
+  },
+  {
+    id: 45, category_id: 13, category_name: 'Papas', category_emoji: '🍟',
+    name: 'Papa Recta',
+    description: 'Papas fritas clásicas estilo francés, bien doradas y crujientes.',
+    price: '40.00',
+    image_url: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500&q=80',
+    available: true, sort_order: 2,
   },
 
   // ══ CHAROLAS ══════════════════════════════

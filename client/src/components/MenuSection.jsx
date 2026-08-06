@@ -3,15 +3,17 @@ import { getCategories, getProducts } from '../services/api.js';
 import { useCart } from '../context/CartContext.jsx';
 import ProductCard from './ProductCard.jsx';
 
-const FRESH_IDS = [1, 2, 3, 10, 11];
+const FRESH_IDS    = [1, 2, 3, 10, 11];
+const ACCORDION_IDS = [1, 2, 3, 10, 11, 12, 13];
 
-// Imagen por categoría fresca
-const FRESH_IMAGES = {
+const CATEGORY_IMAGES = {
   1:  '/fotos/pechuga.jpg',
   2:  '/fotos/pierna-muslo.jpg',
   3:  '/fotos/piernas.jpg',
   10: '/fotos/alitas.jpg',
   11: '/fotos/retazo.jpg',
+  12: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=500&q=80',
+  13: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500&q=80',
 };
 
 function shortName(name, catName) {
@@ -25,7 +27,7 @@ function shortName(name, catName) {
   return stripped || name;
 }
 
-function FreshProductRow({ product, catName }) {
+function FreshProductRow({ product, catName, isFresh }) {
   const { addItem, openCart } = useCart();
   const handleAdd = () => {
     addItem({ id: product.id, name: product.name, price: parseFloat(product.price),
@@ -35,9 +37,14 @@ function FreshProductRow({ product, catName }) {
   return (
     <div className="flex items-center justify-between px-4 py-2
                     border-b border-gray-100 last:border-0 hover:bg-white transition-colors">
-      <p className="font-semibold text-brand-900 text-sm leading-tight flex-1 min-w-0 pr-3">
-        {shortName(product.name, catName)}
-      </p>
+      <div className="flex-1 min-w-0 pr-3">
+        <p className="font-semibold text-brand-900 text-sm leading-tight">
+          {isFresh ? shortName(product.name, catName) : product.name}
+        </p>
+        {!isFresh && (
+          <p className="text-brand-900 font-bold text-sm">${parseFloat(product.price).toFixed(2)}</p>
+        )}
+      </div>
       <button
         onClick={handleAdd}
         className="flex-shrink-0 flex items-center justify-center bg-brand-900 hover:bg-brand-700
@@ -64,7 +71,7 @@ export default function MenuSection() {
     getCategories()
       .then(async ({ data }) => {
         setCategories(data);
-        const freshCats = data.filter(c => FRESH_IDS.includes(c.id)).sort((a, b) => a.sort_order - b.sort_order);
+        const freshCats = data.filter(c => ACCORDION_IDS.includes(c.id)).sort((a, b) => a.sort_order - b.sort_order);
         const results = {};
         for (const cat of freshCats) {
           const { data: prods } = await getProducts(cat.id);
@@ -85,8 +92,8 @@ export default function MenuSection() {
       .catch(() => setLoadingPrepared(false));
   }, [activePrepared]);
 
-  const freshCats    = categories.filter(c =>  FRESH_IDS.includes(c.id)).sort((a, b) => a.sort_order - b.sort_order);
-  const preparedCats = categories.filter(c => !FRESH_IDS.includes(c.id));
+  const freshCats    = categories.filter(c =>  ACCORDION_IDS.includes(c.id)).sort((a, b) => a.sort_order - b.sort_order);
+  const preparedCats = categories.filter(c => !ACCORDION_IDS.includes(c.id));
 
   const toggleFresh = (id) => setOpenFreshCat(prev => prev === id ? null : id);
 
@@ -120,8 +127,9 @@ export default function MenuSection() {
                         flex items-start gap-2 text-sm text-green-800">
           <span className="text-base">📞</span>
           <div>
-            <span className="font-semibold">Precio por kg.</span>
+            <span className="font-semibold">Pollo fresco — precio por kg.</span>
             {' '}Indica en las notas la cantidad que necesitas.
+            Los precios de preparados son por porción.
           </div>
         </div>
 
@@ -130,7 +138,8 @@ export default function MenuSection() {
           {freshCats.map(cat => {
             const isOpen   = openFreshCat === cat.id;
             const products = freshByCategory[cat.id] || [];
-            const imgSrc   = FRESH_IMAGES[cat.id] || '/fotos/logo.jpeg';
+            const isFresh  = FRESH_IDS.includes(cat.id);
+            const imgSrc   = CATEGORY_IMAGES[cat.id] || '/fotos/logo.jpeg';
 
             return (
               <div key={cat.id} className="rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-white">
@@ -167,7 +176,7 @@ export default function MenuSection() {
                     {products.length === 0 ? (
                       <p className="text-gray-400 text-sm px-4 py-3">Cargando...</p>
                     ) : (
-                      products.map(p => <FreshProductRow key={p.id} product={p} catName={cat.name} />)
+                      products.map(p => <FreshProductRow key={p.id} product={p} catName={cat.name} isFresh={isFresh} />)
                     )}
                   </div>
                 )}
