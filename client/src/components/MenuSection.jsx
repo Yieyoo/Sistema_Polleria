@@ -58,7 +58,7 @@ function FreshProductRow({ product, catName, isFresh }) {
   );
 }
 
-function GroupedProductList({ products }) {
+function GroupedProductList({ products, isFresh = false, catName = '' }) {
   const { addItem, openCart } = useCart();
 
   const handleAdd = (p) => {
@@ -67,7 +67,6 @@ function GroupedProductList({ products }) {
     openCart();
   };
 
-  // Agrupar manteniendo el orden original
   const sections = [];
   let lastGroup = undefined;
   products.forEach(p => {
@@ -92,11 +91,15 @@ function GroupedProductList({ products }) {
               className="flex items-center gap-2 px-4 py-1.5
                          border-b border-gray-100 last:border-0 hover:bg-white transition-colors">
               <p className="flex-1 font-semibold text-brand-900 text-sm truncate">
-                {p.short_name || p.name}
+                {isFresh ? shortName(p.name, catName) : (p.short_name || p.name)}
               </p>
-              <p className="text-brand-900 font-bold text-sm w-14 text-right shrink-0">
-                ${parseFloat(p.price).toFixed(2)}
-              </p>
+              {isFresh ? (
+                <span className="text-green-700 text-xs font-semibold w-14 text-right shrink-0">por kg</span>
+              ) : (
+                <p className="text-brand-900 font-bold text-sm w-14 text-right shrink-0">
+                  ${parseFloat(p.price).toFixed(2)}
+                </p>
+              )}
               <button onClick={() => handleAdd(p)}
                 className="flex-shrink-0 flex items-center justify-center bg-brand-900 hover:bg-brand-700
                            text-gold-400 w-7 h-7 rounded-lg transition-colors border border-gold-600/30">
@@ -215,10 +218,8 @@ export default function MenuSection() {
                   <div className="bg-gray-50 border-t border-gray-100">
                     {products.length === 0 ? (
                       <p className="text-gray-400 text-sm px-4 py-3">Cargando...</p>
-                    ) : isFresh ? (
-                      products.map(p => <FreshProductRow key={p.id} product={p} catName={cat.name} isFresh={true} />)
                     ) : (
-                      <GroupedProductList products={products} />
+                      <GroupedProductList products={products} isFresh={isFresh} catName={cat.name} />
                     )}
                   </div>
                 )}
