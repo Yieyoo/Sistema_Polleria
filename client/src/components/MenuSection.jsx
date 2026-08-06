@@ -2,13 +2,12 @@ import { useState, useEffect } from 'react';
 import { getCategories, getProducts } from '../services/api.js';
 import { useCart } from '../context/CartContext.jsx';
 
-const FRESH_IDS    = [1, 2, 3, 10, 11];
-const ACCORDION_IDS = [1, 2, 3, 10, 11, 12];
+const FRESH_IDS    = [1, 2, 10, 11];
+const ACCORDION_IDS = [1, 2, 10, 11, 12];
 
 const CATEGORY_IMAGES = {
   1:  '/fotos/pechuga.jpg',
   2:  '/fotos/pierna-muslo.jpg',
-  3:  '/fotos/piernas.jpg',
   10: '/fotos/alitas.jpg',
   11: '/fotos/retazo.jpg',
   12: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=500&q=80',
