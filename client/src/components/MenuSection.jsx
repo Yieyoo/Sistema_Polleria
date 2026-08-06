@@ -22,7 +22,9 @@ function shortName(name, catName) {
   if (noSuffix !== name) return noSuffix;
   // quitar prefijo "[Categoria] (de Pollo|en|para|con|sin)?"
   const stripped = name.replace(new RegExp(`^${firstWord}\\s+(de\\s+Pollo\\s+|en\\s+|para\\s+)?`, 'i'), '');
-  return stripped || name;
+  // si quedó vacío o empieza con preposición, devolver nombre completo
+  const startsWithPrep = /^(de|en|para|con|sin)\s/i.test(stripped);
+  return (stripped && !startsWithPrep) ? stripped : name;
 }
 
 function FreshProductRow({ product, catName, isFresh }) {
