@@ -58,6 +58,59 @@ function FreshProductRow({ product, catName, isFresh }) {
   );
 }
 
+function GroupedProductList({ products }) {
+  const { addItem, openCart } = useCart();
+
+  const handleAdd = (p) => {
+    addItem({ id: p.id, name: p.name, price: parseFloat(p.price),
+              image_url: p.image_url, product_id: p.id });
+    openCart();
+  };
+
+  // Agrupar manteniendo el orden original
+  const sections = [];
+  let lastGroup = undefined;
+  products.forEach(p => {
+    const g = p.group || null;
+    if (g !== lastGroup) { sections.push({ groupName: g, items: [] }); lastGroup = g; }
+    sections[sections.length - 1].items.push(p);
+  });
+
+  return (
+    <>
+      {sections.map((sec, si) => (
+        <div key={si}>
+          {sec.groupName && (
+            <div className="flex items-center gap-2 px-4 pt-3 pb-1">
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{sec.groupName}</span>
+              <div className="flex-1 h-px bg-gray-200" />
+            </div>
+          )}
+          {sec.items.map(p => (
+            <div key={p.id}
+              className="flex items-center justify-between px-4 py-2
+                         border-b border-gray-100 last:border-0 hover:bg-white transition-colors">
+              <div className="flex-1 min-w-0 pr-3">
+                <p className="font-semibold text-brand-900 text-sm leading-tight">
+                  {p.short_name || p.name}
+                </p>
+                <p className="text-brand-900 font-bold text-sm">${parseFloat(p.price).toFixed(2)}</p>
+              </div>
+              <button onClick={() => handleAdd(p)}
+                className="flex-shrink-0 flex items-center justify-center bg-brand-900 hover:bg-brand-700
+                           text-gold-400 w-8 h-8 rounded-lg transition-colors border border-gold-600/30">
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+            </div>
+          ))}
+        </div>
+      ))}
+    </>
+  );
+}
+
 export default function MenuSection() {
   const [categories,       setCategories]       = useState([]);
   const [freshByCategory,  setFreshByCategory]  = useState({});
@@ -170,13 +223,15 @@ export default function MenuSection() {
                   </div>
                 </button>
 
-                {/* Lista de sub-productos sin imágenes */}
+                {/* Lista de sub-productos */}
                 {isOpen && (
                   <div className="bg-gray-50 border-t border-gray-100">
                     {products.length === 0 ? (
                       <p className="text-gray-400 text-sm px-4 py-3">Cargando...</p>
+                    ) : isFresh ? (
+                      products.map(p => <FreshProductRow key={p.id} product={p} catName={cat.name} isFresh={true} />)
                     ) : (
-                      products.map(p => <FreshProductRow key={p.id} product={p} catName={cat.name} isFresh={isFresh} />)
+                      <GroupedProductList products={products} />
                     )}
                   </div>
                 )}
