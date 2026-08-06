@@ -27,6 +27,7 @@ export default function Admin() {
   const navigate   = useNavigate();
   const adminUser  = JSON.parse(localStorage.getItem('admin_user') || '{}');
 
+  const [activeTab, setActiveTab] = useState('pedidos');
   const [orders,   setOrders]   = useState([]);
   const [summary,  setSummary]  = useState(null);
   const [loading,  setLoading]  = useState(true);
@@ -90,15 +91,34 @@ export default function Admin() {
     <div className="min-h-screen bg-gray-100">
 
       {/* ── Header ── */}
-      <header className="bg-brand-900 px-4 sm:px-8 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <header className="bg-brand-900 px-4 sm:px-8 h-16 flex items-center justify-between gap-4">
+        {/* Logo */}
+        <div className="flex items-center gap-3 shrink-0">
           <img src="/fotos/logo.jpeg" alt="logo"
             className="w-9 h-9 rounded-full object-cover ring-2 ring-gold-400/40"
             onError={e => { e.target.style.display = 'none'; }} />
-          <span className="font-extrabold text-white text-base tracking-tight">El Pollito Gus</span>
+          <span className="font-extrabold text-white text-base tracking-tight hidden sm:inline">El Pollito Gus</span>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3">
-          <span className="hidden sm:inline text-gold-400/80 text-xs font-semibold uppercase tracking-wider">
+
+        {/* Nav tabs */}
+        <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+          {[
+            { id: 'pedidos',  label: 'Pedidos' },
+            { id: 'resumen',  label: 'Resumen' },
+          ].map(tab => (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all
+                ${activeTab === tab.id
+                  ? 'bg-gold-400 text-brand-900 shadow-sm'
+                  : 'text-white/70 hover:text-white hover:bg-white/10'}`}>
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+
+        {/* Acciones */}
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="hidden md:inline text-gold-400/70 text-xs font-semibold">
             {adminUser.full_name || 'Administrador'}
           </span>
           <button onClick={load}
@@ -116,7 +136,7 @@ export default function Admin() {
               <path strokeLinecap="round" strokeLinejoin="round"
                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
             </svg>
-            Cerrar sesión
+            <span className="hidden sm:inline">Cerrar sesión</span>
           </button>
         </div>
       </header>
@@ -124,7 +144,9 @@ export default function Admin() {
       {/* ── Hero ── */}
       <div className="bg-brand-900 px-4 sm:px-8 pt-6 pb-16">
         <p className="text-gold-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Panel de Control</p>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">Gestión de Pedidos</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
+          {activeTab === 'pedidos' ? 'Gestión de Pedidos' : 'Resumen del Día'}
+        </h1>
         <p className="text-white/50 text-sm mt-1">{formatDateLong()} · Actualización automática cada 30 s</p>
       </div>
 
@@ -144,6 +166,59 @@ export default function Admin() {
 
       {/* ── Main ── */}
       <main className="max-w-5xl mx-auto px-4 sm:px-8 py-6 space-y-4">
+
+        {/* ── Vista: Resumen ── */}
+        {activeTab === 'resumen' && summary && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Ingresos */}
+              <div className="bg-brand-900 rounded-2xl shadow-sm p-6">
+                <p className="text-gold-400/70 text-xs font-bold uppercase tracking-wider mb-1">Ingresos del día</p>
+                <p className="text-4xl font-extrabold text-gold-400">
+                  ${parseFloat(summary.total_revenue || 0).toFixed(2)}
+                </p>
+                <p className="text-white/40 text-sm mt-1">{summary.total_orders} pedidos en total</p>
+              </div>
+              {/* Entregas */}
+              <div className="bg-white rounded-2xl shadow-sm p-6">
+                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-3">Estado de pedidos</p>
+                <div className="space-y-2.5">
+                  {[
+                    { label: 'Pendientes',  value: summary.pending,    color: 'bg-amber-400' },
+                    { label: 'Preparando',  value: summary.preparing,  color: 'bg-blue-400' },
+                    { label: 'En camino',   value: summary.on_the_way, color: 'bg-orange-400' },
+                    { label: 'Entregados',  value: summary.delivered,  color: 'bg-green-400' },
+                    { label: 'Cancelados',  value: summary.cancelled,  color: 'bg-gray-300' },
+                  ].map(row => (
+                    <div key={row.label} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${row.color}`} />
+                        <span className="text-gray-600 font-medium">{row.label}</span>
+                      </div>
+                      <span className="font-extrabold text-gray-900">{row.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            {/* Acceso rápido a pedidos */}
+            <button onClick={() => setActiveTab('pedidos')}
+              className="w-full bg-white rounded-2xl shadow-sm p-4 flex items-center justify-between
+                         hover:bg-gray-50 transition-colors group">
+              <span className="font-bold text-gray-700">Ver lista de pedidos</span>
+              <span className="text-brand-700 group-hover:translate-x-1 transition-transform">→</span>
+            </button>
+          </div>
+        )}
+        {activeTab === 'resumen' && !summary && (
+          <div className="bg-white rounded-2xl shadow-sm text-center py-16 text-gray-400">
+            <div className="w-6 h-6 border-2 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-sm font-medium">Cargando resumen...</p>
+          </div>
+        )}
+
+        {/* ── Vista: Pedidos ── */}
+        {activeTab === 'pedidos' && <>
 
         {/* Filtros */}
         <div className="bg-white rounded-2xl shadow-sm p-4 space-y-3">
@@ -231,6 +306,8 @@ export default function Admin() {
             </div>
           )}
         </div>
+        </>}
+
       </main>
 
       {selected && (
