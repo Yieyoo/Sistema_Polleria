@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate }  from 'react-router-dom';
 import { getOrders, updateStatus, getDailySummary } from '../services/api.js';
+import { supabase } from '../services/supabase.js';
 import StatusBadge, { STATUS_CONFIG } from '../components/StatusBadge.jsx';
 
 const STATUS_LIST = ['pendiente', 'preparando', 'en_camino', 'entregado', 'cancelado'];
@@ -55,6 +56,13 @@ export default function Admin() {
     }
   }, [page, filters]);
 
+  // Verificar sesión Supabase al montar
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) navigate('/admin/login');
+    });
+  }, [navigate]);
+
   useEffect(() => { load(); }, [load]);
   useEffect(() => {
     const id = setInterval(load, 30_000);
@@ -72,7 +80,8 @@ export default function Admin() {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await supabase.auth.signOut();
     localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_user');
     navigate('/admin/login');

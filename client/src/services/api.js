@@ -1,131 +1,173 @@
-import axios from 'axios';
-import { CATEGORIES, PRODUCTS, mockCreateOrder } from './mockData.js';
+import { supabase } from './supabase.js';
 
-// ── Modo demo (sin backend) ────────────────────────────────────
-// Cambia a false cuando tengas PostgreSQL + servidor listos
-const USE_MOCK = true;
-
-const delay = (ms = 400) => new Promise(r => setTimeout(r, ms));
-
-// ── API real (Axios) ───────────────────────────────────────────
-const api = axios.create({ baseURL: '/api' });
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
-
-api.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (err.response?.status === 401) {
-      localStorage.removeItem('admin_token');
-      localStorage.removeItem('admin_user');
-      if (window.location.pathname.startsWith('/admin') &&
-          window.location.pathname !== '/admin/login') {
-        window.location.href = '/admin/login';
-      }
-    }
-    return Promise.reject(err);
-  }
-);
-
-// ── API pública ────────────────────────────────────────────────
+// ── Categorías ─────────────────────────────────────────────────
 export const getCategories = async () => {
-  if (USE_MOCK) {
-    await delay();
-    return { data: CATEGORIES };
-  }
-  return api.get('/products/categories');
+  const { data, error } = await supabase
+    .from('categories')
+    .select('*')
+    .order('sort_order');
+  if (error) throw error;
+  return { data };
 };
 
-export const getProducts = async (catId) => {
-  if (USE_MOCK) {
-    await delay();
-    const filtered = catId
-      ? PRODUCTS.filter(p => p.category_id === catId && p.available)
-      : PRODUCTS.filter(p => p.available);
-    return { data: filtered };
-  }
-  return api.get('/products', catId ? { params: { category_id: catId } } : {});
+// ── Productos ──────────────────────────────────────────────────
+export const getProducts = async (categoryId) => {
+  let query = supabase
+    .from('products')
+    .select('*')
+    .eq('available', true)
+    .order('sort_order');
+  if (categoryId) query = query.eq('category_id', categoryId);
+  const { data, error } = await query;
+  if (error) throw error;
+  // map group_name → group para compatibilidad con los componentes existentes
+  return { data: data.map(p => ({ ...p, group: p.group_name })) };
 };
 
-export const createOrder = async (data) => {
-  if (USE_MOCK) {
-    await delay(900);
-    return { data: mockCreateOrder(data) };
-  }
-  return api.post('/orders', data);
+// ── Crear pedido ───────────────────────────────────────────────
+export const createOrder = async (orderData) => {
+  const orderNumber = makeOrderNum();
+  const subtotal = orderData.items.reduce((s, i) => s + i.price * i.quantity, 0);
+
+  const { data: order, error: orderError } = await supabase
+    .from('orders')
+    .insert({
+      order_number:        orderNumber,
+      customer_name:       orderData.customer_name,
+      customer_phone:      orderData.customer_phone,
+      customer_address:    orderData.customer_address,
+      customer_references: orderData.customer_references || '',
+      payment_method:      orderData.payment_method,
+      subtotal,
+      delivery_fee: 0,
+      total: subtotal,
+      status: 'pendiente',
+      notes: orderData.notes || '',
+    })
+    .select()
+    .single();
+
+  if (orderError) throw orderError;
+
+  const { error: itemsError } = await supabase
+    .from('order_items')
+    .insert(
+      orderData.items.map(i => ({
+        order_id:     order.id,
+        product_id:   typeof i.id === 'number' ? i.id : null,
+        product_name: i.name,
+        quantity:     i.quantity,
+        unit_price:   i.price,
+        item_total:   i.price * i.quantity,
+      }))
+    );
+
+  if (itemsError) throw itemsError;
+
+  const payIcon  = orderData.payment_method === 'efectivo' ? '💵 Efectivo' : '💳 Tarjeta';
+  const itemLines = orderData.items
+    .map(i => `  • ${i.quantity}x ${i.name}  $${(i.price * i.quantity).toFixed(2)}`)
+    .join('\n');
+
+  const msg =
+    `🐔 *NUEVO PEDIDO ${orderNumber}*\n\n` +
+    `👤 *Cliente:* ${orderData.customer_name}\n` +
+    `📱 *Teléfono:* ${orderData.customer_phone}\n` +
+    `📍 *Dirección:* ${orderData.customer_address}\n` +
+    `📌 *Referencias:* ${orderData.customer_references || 'Sin referencias'}\n\n` +
+    `🛒 *PRODUCTOS:*\n${itemLines}\n\n` +
+    `💵 *TOTAL: $${subtotal.toFixed(2)}*\n` +
+    `💳 *Pago:* ${payIcon}\n` +
+    (orderData.notes ? `📝 *Notas:* ${orderData.notes}\n` : '') +
+    `\n_Por favor confirmar el pedido_`;
+
+  return {
+    data: {
+      success: true,
+      order: { ...order, items: orderData.items },
+      whatsapp_link: `https://wa.me/521XXXXXXXXXX?text=${encodeURIComponent(msg)}`,
+    },
+  };
 };
 
-// ── API admin ──────────────────────────────────────────────────
-const MOCK_ORDERS = [
-  { id: 1, order_number: 'PG-260614-4821', customer_name: 'Juan Pérez', customer_phone: '5512345678',
-    customer_address: 'Recoge en tienda', payment_method: 'efectivo',
-    subtotal: 160, delivery_fee: 0, total: 160, status: 'preparando', notes: '',
-    created_at: new Date(Date.now() - 10 * 60000).toISOString(),
-    items: [{ product_name: 'Boneless Natural', quantity: 2, product_price: 80, item_total: 160 }] },
-  { id: 2, order_number: 'PG-260614-3392', customer_name: 'María García', customer_phone: '5598765432',
-    customer_address: 'Recoge en tienda', payment_method: 'transferencia',
-    subtotal: 290, delivery_fee: 0, total: 290, status: 'pendiente', notes: 'Extra salsa buffalo',
-    created_at: new Date(Date.now() - 3 * 60000).toISOString(),
-    items: [
-      { product_name: 'Boneless Buffalo', quantity: 2, product_price: 85, item_total: 170 },
-      { product_name: 'Papa Gajo', quantity: 2, product_price: 45, item_total: 90 },
-      { product_name: 'Nuggets de Pollo', quantity: 1, product_price: 70, item_total: 70 },
-    ]},
-  { id: 3, order_number: 'PG-260614-1105', customer_name: 'Carlos López', customer_phone: '5511223344',
-    customer_address: 'Recoge en tienda', payment_method: 'efectivo',
-    subtotal: 130, delivery_fee: 0, total: 130, status: 'en_camino', notes: '',
-    created_at: new Date(Date.now() - 35 * 60000).toISOString(),
-    items: [{ product_name: 'Charola Chica', quantity: 1, product_price: 130, item_total: 130 }] },
-  { id: 4, order_number: 'PG-260614-7734', customer_name: 'Ana Martínez', customer_phone: '5544332211',
-    customer_address: 'Recoge en tienda', payment_method: 'transferencia',
-    subtotal: 390, delivery_fee: 0, total: 390, status: 'entregado', notes: '',
-    created_at: new Date(Date.now() - 90 * 60000).toISOString(),
-    items: [{ product_name: 'Charola Grande', quantity: 1, product_price: 390, item_total: 390 }] },
-];
-
-let mockOrdersState = [...MOCK_ORDERS];
-
-export const adminLogin = async (creds) => {
-  if (USE_MOCK) {
-    await delay(600);
-    if (creds.username === 'admin' && creds.password === 'polleria2024') {
-      const token = 'mock-token-demo';
-      return { data: { token, username: 'admin', full_name: 'Administrador' } };
-    }
-    throw { response: { data: { error: 'Credenciales incorrectas.' } } };
-  }
-  return api.post('/admin/login', creds);
+// ── Admin: login ───────────────────────────────────────────────
+export const adminLogin = async ({ username, password }) => {
+  const email = username.includes('@') ? username : `${username}@pollitogus.com`;
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) throw { response: { data: { error: 'Credenciales incorrectas.' } } };
+  const user = data.user;
+  localStorage.setItem('admin_token', data.session.access_token);
+  localStorage.setItem('admin_user', JSON.stringify({
+    username: user.email,
+    full_name: user.user_metadata?.full_name || 'Administrador',
+  }));
+  return { data: { token: data.session.access_token, username: user.email, full_name: user.user_metadata?.full_name || 'Administrador' } };
 };
 
-export const getOrders = async (params) => {
-  if (USE_MOCK) {
-    await delay(400);
-    let filtered = [...mockOrdersState];
-    if (params?.status) filtered = filtered.filter(o => o.status === params.status);
-    return { data: { orders: filtered, total: filtered.length, page: 1, limit: 30 } };
+// ── Admin: pedidos ─────────────────────────────────────────────
+export const getOrders = async ({ page = 1, limit = 20, status, date } = {}) => {
+  let query = supabase
+    .from('orders')
+    .select('*, order_items(*)', { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range((page - 1) * limit, page * limit - 1);
+
+  if (status) query = query.eq('status', status);
+  if (date) {
+    query = query
+      .gte('created_at', `${date}T00:00:00`)
+      .lte('created_at', `${date}T23:59:59`);
   }
-  return api.get('/admin/orders', { params });
+
+  const { data, error, count } = await query;
+  if (error) throw error;
+
+  const orders = (data || []).map(o => ({
+    ...o,
+    items: o.order_items || [],
+  }));
+
+  return { data: { orders, total: count || 0 } };
 };
 
-export const updateStatus = async (id, status) => {
-  if (USE_MOCK) {
-    await delay(300);
-    mockOrdersState = mockOrdersState.map(o => o.id === id ? { ...o, status } : o);
-    return { data: mockOrdersState.find(o => o.id === id) };
-  }
-  return api.patch(`/admin/orders/${id}`, { status });
+export const updateStatus = async (orderId, status) => {
+  const { error } = await supabase
+    .from('orders')
+    .update({ status })
+    .eq('id', orderId);
+  if (error) throw error;
+  return { data: { success: true } };
 };
 
-export const getDailySummary = async (date) => {
-  if (USE_MOCK) {
-    await delay(300);
-    return { data: { total_orders: 4, pending: 1, preparing: 1, on_the_way: 1, delivered: 1, cancelled: 0, total_revenue: 970, confirmed_revenue: 390 } };
-  }
-  return api.get('/admin/summary', date ? { params: { date } } : {});
+export const getDailySummary = async (date = new Date().toISOString().split('T')[0]) => {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('status, total')
+    .gte('created_at', `${date}T00:00:00`)
+    .lte('created_at', `${date}T23:59:59`);
+
+  if (error) throw error;
+
+  return {
+    data: {
+      total_orders:  data.length,
+      pending:       data.filter(o => o.status === 'pendiente').length,
+      preparing:     data.filter(o => o.status === 'preparando').length,
+      on_the_way:    data.filter(o => o.status === 'en_camino').length,
+      delivered:     data.filter(o => o.status === 'entregado').length,
+      cancelled:     data.filter(o => o.status === 'cancelado').length,
+      total_revenue: data
+        .filter(o => o.status !== 'cancelado')
+        .reduce((s, o) => s + parseFloat(o.total || 0), 0),
+    },
+  };
 };
 
-export default api;
+// ── Helpers ────────────────────────────────────────────────────
+function makeOrderNum() {
+  const d  = new Date();
+  const yy = String(d.getFullYear()).slice(-2);
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `PG-${yy}${mm}${dd}-${Math.floor(Math.random() * 9000) + 1000}`;
+}
