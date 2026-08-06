@@ -166,10 +166,15 @@ export const PRODUCTS = [
 
   // ══ ESPECIALIDADES ════════════════════════
   { id: 34, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
-    name: 'Nuggets de Pollo 🦕', short_name: 'Nuggets 🦕', group: null, unit: '250 g aprox.',
-    description: '100% pechuga, crujientes por fuera y jugosos por dentro.',
+    name: 'Nuggets Dinosaurio 🦕', short_name: 'Dinosaurio 🦕', group: 'Nuggets',  unit: '250 g aprox.',
+    description: '100% pechuga en forma de dino, crujientes y jugosos.',
     price: '70.00', image_url: 'https://images.unsplash.com/photo-1619881590738-a111d176d906?w=500&q=80',
     available: true, sort_order: 1 },
+  { id: 53, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
+    name: 'Nuggets Estrella ⭐', short_name: 'Estrella ⭐', group: 'Nuggets', unit: '250 g aprox.',
+    description: '100% pechuga en forma de estrella, crujientes y jugosos.',
+    price: '70.00', image_url: 'https://images.unsplash.com/photo-1619881590738-a111d176d906?w=500&q=80',
+    available: true, sort_order: 2 },
   { id: 35, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
     name: 'Palomitas de Pollo', short_name: 'Palomitas de Pollo', group: null, unit: '250 g aprox.',
     description: 'Pequeños bocados de pollo empanizado.',
