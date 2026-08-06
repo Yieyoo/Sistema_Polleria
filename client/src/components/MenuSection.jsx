@@ -59,7 +59,90 @@ function FreshProductRow({ product, catName, isFresh }) {
   );
 }
 
-const PRESENTACIONES = ['Entera', 'Bistec', 'Fajitas', 'Alambre', 'Molida'];
+const PRESENTACIONES        = ['Entera', 'Bistec', 'Fajitas', 'Alambre', 'Molida'];
+const PRESENTACIONES_PECHUGA = ['Entera', 'Bistec', 'Fajitas', 'Alambre', 'Molida', 'Para Cocer'];
+
+function formatPechugas(n) {
+  const whole = Math.floor(n);
+  const half  = Math.round(n * 2) % 2 !== 0;
+  if (whole === 0) return '½';
+  if (!half) return `${whole}`;
+  return `${whole} y ½`;
+}
+
+function PechugarSelector() {
+  const { addItem, openCart } = useCart();
+  const [qty,  setQty]  = useState(0.5);
+  const [pres, setPres] = useState('Entera');
+
+  const handleAdd = () => {
+    addItem({
+      id: `pechuga-${Date.now()}`,
+      product_id: `pechuga-${Date.now()}`,
+      name: `Pechuga ${formatPechugas(qty)} — ${pres}`,
+      price: 0,
+      image_url: '/fotos/pechuga.jpg',
+    });
+    openCart();
+  };
+
+  return (
+    <div className="px-4 pt-4 pb-2 space-y-3">
+      {/* Header */}
+      <div className="flex items-center gap-2 pb-1 border-b border-gray-100">
+        <img src="/fotos/pechuga.jpg" alt=""
+          className="w-8 h-8 rounded-lg object-cover shrink-0 ring-1 ring-gray-200"
+          onError={e => { e.target.style.display = 'none'; }} />
+        <div>
+          <p className="text-sm font-extrabold text-brand-900 leading-tight">Pechuga de Pollo</p>
+          <p className="text-xs text-gray-400">Elige la cantidad y presentación</p>
+        </div>
+      </div>
+
+      {/* Cantidad en medias pechugas */}
+      <div className="flex items-center justify-between">
+        <div>
+          <span className="text-sm font-bold text-brand-900">Pechugas</span>
+          <span className="ml-2 text-xs text-gray-400">por kg</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <button onClick={() => setQty(q => Math.max(0.5, Math.round((q - 0.5) * 10) / 10))}
+            className="w-7 h-7 rounded-lg bg-brand-900 text-gold-400 font-bold text-base flex items-center justify-center border border-gold-600/30 leading-none">
+            −
+          </button>
+          <span className="w-14 text-center font-bold text-brand-900 text-sm">{formatPechugas(qty)}</span>
+          <button onClick={() => setQty(q => Math.min(10, Math.round((q + 0.5) * 10) / 10))}
+            className="w-7 h-7 rounded-lg bg-brand-900 text-gold-400 font-bold text-base flex items-center justify-center border border-gold-600/30 leading-none">
+            +
+          </button>
+        </div>
+      </div>
+
+      {/* Presentación */}
+      <div className="flex flex-wrap gap-1">
+        {PRESENTACIONES_PECHUGA.map(p => (
+          <button key={p} onClick={() => setPres(p)}
+            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border transition-colors
+              ${pres === p
+                ? 'bg-brand-900 text-gold-400 border-gold-600/30'
+                : 'bg-white text-gray-600 border-gray-200 hover:border-brand-400'}`}>
+            {p}
+          </button>
+        ))}
+      </div>
+
+      <button onClick={handleAdd}
+        className="w-full flex items-center justify-center gap-2 bg-brand-900 hover:bg-brand-700
+                   text-gold-400 font-bold py-2.5 rounded-xl transition-colors border border-gold-600/30">
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        Agregar al carrito
+      </button>
+      <p className="text-center text-xs text-gray-400 pb-1">Precio por kg — se calcula en tienda</p>
+    </div>
+  );
+}
 
 function CombinadoSelector() {
   const { addItem, openCart } = useCart();
@@ -332,6 +415,8 @@ export default function MenuSection() {
                     <div className="bg-gray-50 border-t border-gray-100">
                       {!(cat.id in freshByCategory) ? (
                         <p className="text-gray-400 text-sm px-4 py-3">Cargando...</p>
+                      ) : cat.id === 1 ? (
+                        <PechugarSelector />
                       ) : cat.id === 2 ? (
                         <CombinadoSelector />
                       ) : (

@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────
 export const CATEGORIES = [
   // Pollo Fresco
-  { id: 1,  name: 'Pechuga de Pollo',  description: 'Bisteces, fajitas, alambre, molida y más', emoji: '🫀', sort_order: 1 },
+  { id: 1,  name: 'Pechuga de Pollo',  description: 'Elige cuántas pechugas y en qué presentación', emoji: '🫀', sort_order: 1 },
   { id: 2,  name: 'Pierna y Muslo',    description: 'Arma tu combinado a la medida', emoji: '🍗', sort_order: 2 },
   { id: 10, name: 'Alitas de Pollo',   description: 'Alitas solas, frescas y de calidad',         emoji: '🐔', sort_order: 3 },
   { id: 11, name: 'Retazo de Pollo',   description: 'Con alas o sin alas, precio por kg',         emoji: '🐓', sort_order: 5 },
@@ -18,43 +18,7 @@ export const CATEGORIES = [
 // ─────────────────────────────────────────────
 export const PRODUCTS = [
 
-  // ══ PECHUGA DE POLLO ══════════════════════
-  { id: 1, category_id: 1, category_name: 'Pechuga de Pollo', category_emoji: '🫀',
-    name: 'Pechuga — 4 Bisteces', group: 'Bisteces',
-    description: 'Pechuga fresca en 4 bisteces.',
-    price: '00.00', image_url: '/fotos/pechuga.jpg', available: true, sort_order: 1 },
-  { id: 2, category_id: 1, category_name: 'Pechuga de Pollo', category_emoji: '🫀',
-    name: 'Pechuga — 6 Bisteces', group: 'Bisteces',
-    description: 'Pechuga fresca en 6 bisteces.',
-    price: '00.00', image_url: '/fotos/pechuga.jpg', available: true, sort_order: 2 },
-  { id: 3, category_id: 1, category_name: 'Pechuga de Pollo', category_emoji: '🫀',
-    name: 'Pechuga — 8 Bisteces', group: 'Bisteces',
-    description: 'Pechuga fresca en 8 bisteces.',
-    price: '00.00', image_url: '/fotos/pechuga.jpg', available: true, sort_order: 3 },
-  { id: 4, category_id: 1, category_name: 'Pechuga de Pollo', category_emoji: '🫀',
-    name: 'Pechuga — 10 Bisteces', group: 'Bisteces',
-    description: 'Pechuga fresca en 10 bisteces.',
-    price: '00.00', image_url: '/fotos/pechuga.jpg', available: true, sort_order: 4 },
-  { id: 46, category_id: 1, category_name: 'Pechuga de Pollo', category_emoji: '🫀',
-    name: 'Pechuga — 12 Bisteces', group: 'Bisteces',
-    description: 'Pechuga fresca en 12 bisteces.',
-    price: '00.00', image_url: '/fotos/pechuga.jpg', available: true, sort_order: 5 },
-  { id: 5, category_id: 1, category_name: 'Pechuga de Pollo', category_emoji: '🫀',
-    name: 'Pechuga en Fajitas', group: 'Otras Presentaciones',
-    description: 'Pechuga fresca cortada en fajitas.',
-    price: '00.00', image_url: '/fotos/pechuga.jpg', available: true, sort_order: 5 },
-  { id: 6, category_id: 1, category_name: 'Pechuga de Pollo', category_emoji: '🫀',
-    name: 'Pechuga para Alambre', group: 'Otras Presentaciones',
-    description: 'Pechuga fresca cortada para alambre.',
-    price: '00.00', image_url: '/fotos/pechuga.jpg', available: true, sort_order: 6 },
-  { id: 7, category_id: 1, category_name: 'Pechuga de Pollo', category_emoji: '🫀',
-    name: 'Pechuga Molida', group: 'Otras Presentaciones',
-    description: 'Pechuga de pollo molida fresca.',
-    price: '00.00', image_url: '/fotos/pechuga.jpg', available: true, sort_order: 7 },
-  { id: 8, category_id: 1, category_name: 'Pechuga de Pollo', category_emoji: '🫀',
-    name: 'Pechuga para Cocer (entera)', group: 'Otras Presentaciones',
-    description: 'Pechuga entera fresca para cocer.',
-    price: '00.00', image_url: '/fotos/pechuga.jpg', available: true, sort_order: 8 },
+  // ══ PECHUGA DE POLLO — solo selector (sin productos sueltos) ══
 
   // ══ PIERNA Y MUSLO — solo combinado (sin productos sueltos) ══
 
