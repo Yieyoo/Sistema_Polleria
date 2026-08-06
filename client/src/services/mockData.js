@@ -208,15 +208,20 @@ export const PRODUCTS = [
 
   // ══ PAPAS ═════════════════════════════════
   { id: 44, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
-    name: 'Papa Gajo', short_name: 'Gajo', group: 'Papas', unit: 'porción',
+    name: 'Papa Gajo', short_name: 'Gajo', group: 'Papas', unit: '250 g aprox.',
     description: 'Gajos de papa sazonados, crujientes por fuera.',
     price: '45.00', image_url: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500&q=80',
     available: true, sort_order: 11 },
   { id: 45, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
-    name: 'Papa Recta', short_name: 'Recta', group: 'Papas', unit: 'porción',
+    name: 'Papa Recta', short_name: 'Recta', group: 'Papas', unit: '250 g aprox.',
     description: 'Papas fritas clásicas bien doradas.',
     price: '40.00', image_url: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500&q=80',
     available: true, sort_order: 12 },
+  { id: 52, category_id: 12, category_name: 'Especialidades', category_emoji: '🔥',
+    name: 'Papa Ondulada', short_name: 'Ondulada', group: 'Papas', unit: '250 g aprox.',
+    description: 'Papas onduladas fritas, crujientes y sazonadas.',
+    price: '45.00', image_url: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500&q=80',
+    available: true, sort_order: 13 },
 
   // ══ CHAROLAS ══════════════════════════════
   {
