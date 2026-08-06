@@ -272,6 +272,111 @@ function CombinadoSelector() {
   );
 }
 
+function EspecialidadesSelector({ products }) {
+  const { addItem, openCart } = useCart();
+  const [qtys, setQtys] = useState({});
+
+  const setQty = (id, v) => setQtys(prev => ({ ...prev, [id]: Math.max(0, v) }));
+
+  const handleAdd = () => {
+    const selected = products.filter(p => (qtys[p.id] || 0) > 0);
+    if (!selected.length) return;
+    selected.forEach(p => {
+      const q = qtys[p.id] || 0;
+      for (let i = 0; i < q; i++) {
+        addItem({ id: p.id, product_id: p.id,
+          name: p.short_name || p.name,
+          price: parseFloat(p.price), image_url: p.image_url });
+      }
+    });
+    openCart();
+  };
+
+  const total      = products.reduce((s, p) => s + (qtys[p.id] || 0) * parseFloat(p.price), 0);
+  const hasItems   = products.some(p => (qtys[p.id] || 0) > 0);
+
+  const sections = [];
+  let lastGroup  = undefined;
+  products.forEach(p => {
+    const g = p.group || null;
+    if (g !== lastGroup) { sections.push({ groupName: g, items: [] }); lastGroup = g; }
+    sections[sections.length - 1].items.push(p);
+  });
+
+  return (
+    <div className="pt-3 pb-2">
+      {/* Header */}
+      <div className="flex items-center gap-2 pb-2 border-b border-gray-100 px-4 mb-1">
+        <img src="https://images.unsplash.com/photo-1562967914-608f82629710?w=100&q=80" alt=""
+          className="w-8 h-8 rounded-lg object-cover shrink-0 ring-1 ring-gray-200" />
+        <div>
+          <p className="text-sm font-extrabold text-brand-900 leading-tight">Especialidades</p>
+          <p className="text-xs text-gray-400">Elige la cantidad de cada producto</p>
+        </div>
+      </div>
+
+      {sections.map((sec, si) => (
+        <div key={si}>
+          {sec.groupName && (
+            <div className="flex items-center justify-center gap-3 px-4 py-1.5 bg-brand-900 mt-1">
+              <div className="w-1 h-3 rounded-full bg-gold-400" />
+              <span className="text-xs font-extrabold text-gold-400 uppercase tracking-widest">{sec.groupName}</span>
+              <div className="w-1 h-3 rounded-full bg-gold-400" />
+            </div>
+          )}
+          {sec.items.map(p => {
+            const qty = qtys[p.id] || 0;
+            return (
+              <div key={p.id}
+                className="flex items-center gap-2 px-4 py-2 border-b border-gray-100 last:border-0 hover:bg-white transition-colors">
+                <p className="flex-1 font-semibold text-brand-900 text-sm truncate">
+                  {p.short_name || p.name}
+                </p>
+                <span className="text-brand-900 font-bold text-sm w-12 text-right shrink-0">
+                  ${parseFloat(p.price).toFixed(0)}
+                </span>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button onClick={() => setQty(p.id, qty - 1)} disabled={qty === 0}
+                    className={`w-6 h-6 rounded-md text-sm font-bold flex items-center justify-center border leading-none transition-colors
+                      ${qty > 0 ? 'bg-brand-900 text-gold-400 border-gold-600/30 hover:bg-brand-700'
+                                : 'bg-gray-100 text-gray-300 border-gray-200 cursor-default'}`}>
+                    −
+                  </button>
+                  <span className={`w-5 text-center text-sm font-bold transition-colors ${qty > 0 ? 'text-brand-900' : 'text-gray-300'}`}>
+                    {qty}
+                  </span>
+                  <button onClick={() => setQty(p.id, qty + 1)}
+                    className="w-6 h-6 rounded-md bg-brand-900 hover:bg-brand-700 text-gold-400 text-sm font-bold flex items-center justify-center border border-gold-600/30 leading-none transition-colors">
+                    +
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ))}
+
+      <div className="px-4 pt-3 space-y-2">
+        {hasItems && (
+          <div className="flex items-center justify-between text-sm font-bold text-brand-900 pb-1 border-t border-gray-100 pt-2">
+            <span>Total</span>
+            <span>${total.toFixed(2)}</span>
+          </div>
+        )}
+        <button onClick={handleAdd} disabled={!hasItems}
+          className="w-full flex items-center justify-center gap-2 bg-brand-900 hover:bg-brand-700
+                     disabled:opacity-40 disabled:cursor-not-allowed
+                     text-gold-400 font-bold py-2.5 rounded-xl transition-colors border border-gold-600/30">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          Agregar al carrito
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function GroupedProductList({ products, isFresh = false, catName = '' }) {
   const { addItem, openCart } = useCart();
 
@@ -451,6 +556,8 @@ export default function MenuSection() {
                         <PechugarSelector />
                       ) : cat.id === 2 ? (
                         <CombinadoSelector />
+                      ) : cat.id === 12 ? (
+                        <EspecialidadesSelector products={products} />
                       ) : (
                         <GroupedProductList products={products} isFresh={isFresh} catName={cat.name} />
                       )}
