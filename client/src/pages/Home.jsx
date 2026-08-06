@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import Navbar            from '../components/Navbar.jsx';
-import Hero              from '../components/Hero.jsx';
 import MenuSection       from '../components/MenuSection.jsx';
 import Cart              from '../components/Cart.jsx';
 import OrderForm         from '../components/OrderForm.jsx';
@@ -20,7 +19,6 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <Hero />
       <MenuSection />
 
       {/* Sticky CTA móvil */}
