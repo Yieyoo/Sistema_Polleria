@@ -90,6 +90,23 @@ export const createOrder = async (orderData) => {
   };
 };
 
+// ── Admin: gestión de productos ───────────────────────────────
+export const getAdminProducts = async () => {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*, categories(name)')
+    .order('category_id')
+    .order('sort_order');
+  if (error) throw error;
+  return { data: data.map(p => ({ ...p, group: p.group_name, category_name: p.categories?.name })) };
+};
+
+export const updateProduct = async (id, fields) => {
+  const { error } = await supabase.from('products').update(fields).eq('id', id);
+  if (error) throw error;
+  return { data: { success: true } };
+};
+
 // ── Admin: login ───────────────────────────────────────────────
 export const adminLogin = async ({ username, password }) => {
   const email = username.includes('@') ? username : `${username}@pollitogus.com`;

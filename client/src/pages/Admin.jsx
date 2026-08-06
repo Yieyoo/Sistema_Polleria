@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate }  from 'react-router-dom';
-import { getOrders, updateStatus, getDailySummary } from '../services/api.js';
+import { getOrders, updateStatus, getDailySummary, getAdminProducts, updateProduct } from '../services/api.js';
 import { supabase } from '../services/supabase.js';
 import StatusBadge, { STATUS_CONFIG } from '../components/StatusBadge.jsx';
 
@@ -27,7 +27,9 @@ export default function Admin() {
   const navigate   = useNavigate();
   const adminUser  = JSON.parse(localStorage.getItem('admin_user') || '{}');
 
-  const [activeTab, setActiveTab] = useState('pedidos');
+  const [activeTab,   setActiveTab]   = useState('pedidos');
+  const [products,    setProducts]    = useState([]);
+  const [prodLoading, setProdLoading] = useState(false);
   const [orders,   setOrders]   = useState([]);
   const [summary,  setSummary]  = useState(null);
   const [loading,  setLoading]  = useState(true);
@@ -62,6 +64,32 @@ export default function Admin() {
       if (!session) navigate('/admin/login');
     });
   }, [navigate]);
+
+  const loadProducts = useCallback(async () => {
+    setProdLoading(true);
+    try {
+      const res = await getAdminProducts();
+      setProducts(res.data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setProdLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'productos') loadProducts();
+  }, [activeTab, loadProducts]);
+
+  const handleProductField = async (id, field, value) => {
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
+    try {
+      await updateProduct(id, { [field]: value });
+    } catch {
+      alert('Error al guardar el cambio.');
+      loadProducts();
+    }
+  };
 
   useEffect(() => { load(); }, [load]);
   useEffect(() => {
@@ -103,8 +131,9 @@ export default function Admin() {
         {/* Nav tabs */}
         <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
           {[
-            { id: 'pedidos',  label: 'Pedidos' },
-            { id: 'resumen',  label: 'Resumen' },
+            { id: 'pedidos',   label: 'Pedidos' },
+            { id: 'resumen',   label: 'Resumen' },
+            { id: 'productos', label: 'Productos' },
           ].map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all
@@ -145,7 +174,7 @@ export default function Admin() {
       <div className="bg-brand-900 px-4 sm:px-8 pt-6 pb-16">
         <p className="text-gold-400 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Panel de Control</p>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
-          {activeTab === 'pedidos' ? 'Gestión de Pedidos' : 'Resumen del Día'}
+          {activeTab === 'pedidos' ? 'Gestión de Pedidos' : activeTab === 'resumen' ? 'Resumen del Día' : 'Catálogo de Productos'}
         </h1>
         <p className="text-white/50 text-sm mt-1">{formatDateLong()} · Actualización automática cada 30 s</p>
       </div>
@@ -307,6 +336,37 @@ export default function Admin() {
           )}
         </div>
         </>}
+
+        {/* ── Vista: Productos ── */}
+        {activeTab === 'productos' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-500">Activa/desactiva disponibilidad y edita precios en tiempo real.</p>
+              <button onClick={loadProducts}
+                className="flex items-center gap-1.5 text-xs font-semibold text-gray-500
+                           hover:text-brand-700 transition-colors">
+                <svg className={`w-3.5 h-3.5 ${prodLoading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Actualizar
+              </button>
+            </div>
+
+            {prodLoading && products.length === 0 ? (
+              <div className="bg-white rounded-2xl shadow-sm text-center py-16 text-gray-400">
+                <div className="w-6 h-6 border-2 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+                <p className="text-sm font-medium">Cargando productos...</p>
+              </div>
+            ) : (
+              <ProductTable
+                products={products}
+                onToggle={(id, val) => handleProductField(id, 'available', val)}
+                onPriceChange={(id, val) => handleProductField(id, 'price', val)}
+              />
+            )}
+          </div>
+        )}
 
       </main>
 
@@ -504,6 +564,102 @@ function OrderDetailModal({ order, onClose, onStatusChange }) {
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── Product Table ─────────────────────────────────────────────────────────────
+
+function ProductTable({ products, onToggle, onPriceChange }) {
+  const [editing, setEditing] = useState(null);
+  const [tempPrice, setTempPrice] = useState('');
+
+  // Agrupar por categoría
+  const byCat = products.reduce((acc, p) => {
+    const key = p.category_name || 'Sin categoría';
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(p);
+    return acc;
+  }, {});
+
+  const startEdit = (p) => {
+    setEditing(p.id);
+    setTempPrice(String(p.price));
+  };
+
+  const commitEdit = (p) => {
+    const val = parseFloat(tempPrice);
+    if (!isNaN(val) && val >= 0) onPriceChange(p.id, val);
+    setEditing(null);
+  };
+
+  return (
+    <div className="space-y-4">
+      {Object.entries(byCat).map(([cat, items]) => (
+        <div key={cat} className="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <div className="px-4 py-3 bg-brand-900 flex items-center gap-2">
+            <span className="font-bold text-white text-sm">{cat}</span>
+            <span className="text-gold-400/60 text-xs">{items.length} productos</span>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {items.map(p => (
+              <div key={p.id}
+                className={`flex items-center gap-3 px-4 py-3 transition-colors
+                  ${!p.available ? 'bg-gray-50 opacity-60' : ''}`}>
+                {/* Toggle disponibilidad */}
+                <button
+                  onClick={() => onToggle(p.id, !p.available)}
+                  className={`relative w-10 h-5.5 shrink-0 rounded-full transition-colors duration-200
+                    ${p.available ? 'bg-green-500' : 'bg-gray-300'}`}
+                  style={{ minWidth: '2.5rem', height: '1.375rem' }}
+                  title={p.available ? 'Disponible — clic para desactivar' : 'No disponible — clic para activar'}>
+                  <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200
+                    ${p.available ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                </button>
+
+                {/* Nombre */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-gray-900 text-sm truncate">{p.name}</p>
+                  {p.unit && <p className="text-xs text-gray-400">{p.unit}</p>}
+                </div>
+
+                {/* Precio editable */}
+                <div className="shrink-0">
+                  {editing === p.id ? (
+                    <div className="flex items-center gap-1">
+                      <span className="text-gray-400 text-sm">$</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={tempPrice}
+                        onChange={e => setTempPrice(e.target.value)}
+                        onBlur={() => commitEdit(p)}
+                        onKeyDown={e => { if (e.key === 'Enter') commitEdit(p); if (e.key === 'Escape') setEditing(null); }}
+                        className="w-20 border border-brand-400 rounded-xl px-2 py-1 text-sm font-bold
+                                   focus:outline-none focus:ring-2 focus:ring-brand-400 text-right"
+                        autoFocus
+                      />
+                    </div>
+                  ) : (
+                    <button onClick={() => startEdit(p)}
+                      className="flex items-center gap-1 group px-2 py-1 rounded-xl hover:bg-gray-100 transition-colors">
+                      <span className="font-bold text-gray-900 text-sm">
+                        ${parseFloat(p.price || 0).toFixed(0)}
+                      </span>
+                      <svg className="w-3 h-3 text-gray-300 group-hover:text-brand-500 transition-colors"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
