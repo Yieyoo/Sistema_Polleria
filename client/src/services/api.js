@@ -26,7 +26,7 @@ export const getProducts = async (categoryId) => {
 
 // ── Crear pedido ───────────────────────────────────────────────
 export const createOrder = async (orderData) => {
-  const orderNumber = makeOrderNum();
+  const orderNumber = await makeOrderNum();
   const subtotal = orderData.items.reduce((s, i) => s + i.price * i.quantity, 0);
 
   const { data: order, error: orderError } = await supabase
@@ -181,10 +181,25 @@ export const getDailySummary = async (date = new Date().toISOString().split('T')
 };
 
 // ── Helpers ────────────────────────────────────────────────────
-function makeOrderNum() {
-  const d  = new Date();
-  const yy = String(d.getFullYear()).slice(-2);
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `PG-${yy}${mm}${dd}-${Math.floor(Math.random() * 9000) + 1000}`;
+async function makeOrderNum() {
+  const now  = new Date();
+  const dd   = String(now.getDate()).padStart(2, '0');
+  const mm   = String(now.getMonth() + 1).padStart(2, '0');
+  const yyyy = String(now.getFullYear());
+  const prefix = `PG-${dd}${mm}${yyyy}-`;
+
+  const { data } = await supabase
+    .from('orders')
+    .select('order_number')
+    .like('order_number', `${prefix}%`)
+    .order('order_number', { ascending: false })
+    .limit(1);
+
+  let seq = 1;
+  if (data && data.length > 0) {
+    const last = parseInt(data[0].order_number.split('-')[2], 10);
+    if (!isNaN(last)) seq = last + 1;
+  }
+
+  return `${prefix}${String(seq).padStart(4, '0')}`;
 }
