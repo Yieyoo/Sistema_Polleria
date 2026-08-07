@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate }  from 'react-router-dom';
-import { getOrders, updateStatus, getDailySummary, getAdminProducts, updateProduct, createOrder, deleteOrder, updateOrder } from '../services/api.js';
+import { getOrders, updateStatus, getDailySummary, getMonthlySummary, getAdminProducts, updateProduct, createOrder, deleteOrder, updateOrder } from '../services/api.js';
 import { supabase } from '../services/supabase.js';
 import StatusBadge, { STATUS_CONFIG } from '../components/StatusBadge.jsx';
 
@@ -31,7 +31,6 @@ export default function Admin() {
   const [products,    setProducts]    = useState([]);
   const [prodLoading, setProdLoading] = useState(false);
   const [orders,   setOrders]   = useState([]);
-  const [summary,  setSummary]  = useState(null);
   const [loading,  setLoading]  = useState(true);
   const [filters,  setFilters]  = useState({ status: '', date: todayISO() });
   const [page,     setPage]     = useState(1);
@@ -46,13 +45,9 @@ export default function Admin() {
       const params = { page, limit: LIMIT };
       if (filters.status) params.status = filters.status;
       if (filters.date)   params.date   = filters.date;
-      const [oRes, sRes] = await Promise.all([
-        getOrders(params),
-        getDailySummary(filters.date || undefined),
-      ]);
+      const oRes = await getOrders(params);
       setOrders(oRes.data.orders);
       setTotal(oRes.data.total);
-      setSummary(sRes.data);
     } catch (e) {
       console.error(e);
     } finally {
@@ -201,57 +196,7 @@ export default function Admin() {
       <main className="max-w-5xl mx-auto px-4 sm:px-8 py-5 space-y-4">
 
         {/* ── Vista: Resumen ── */}
-        {activeTab === 'resumen' && summary && (
-          <div className="space-y-4">
-            {/* Precios del día */}
-            <DailyPrices />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Ingresos */}
-              <div className="bg-brand-900 rounded-2xl shadow-sm p-6">
-                <p className="text-gold-400/70 text-xs font-bold uppercase tracking-wider mb-1">Ingresos del día</p>
-                <p className="text-4xl font-extrabold text-gold-400">
-                  ${parseFloat(summary.total_revenue || 0).toFixed(2)}
-                </p>
-                <p className="text-white/40 text-sm mt-1">{summary.total_orders} pedidos en total</p>
-              </div>
-              {/* Entregas */}
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-3">Estado de pedidos</p>
-                <div className="space-y-2.5">
-                  {[
-                    { label: 'Pendientes',  value: summary.pending,    color: 'bg-amber-400' },
-                    { label: 'Preparando',  value: summary.preparing,  color: 'bg-blue-400' },
-                    { label: 'En camino',   value: summary.on_the_way, color: 'bg-orange-400' },
-                    { label: 'Entregados',  value: summary.delivered,  color: 'bg-green-400' },
-                    { label: 'Cancelados',  value: summary.cancelled,  color: 'bg-gray-300' },
-                  ].map(row => (
-                    <div key={row.label} className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full ${row.color}`} />
-                        <span className="text-gray-600 font-medium">{row.label}</span>
-                      </div>
-                      <span className="font-extrabold text-gray-900">{row.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            {/* Acceso rápido a pedidos */}
-            <button onClick={() => setActiveTab('pedidos')}
-              className="w-full bg-white rounded-2xl shadow-sm p-4 flex items-center justify-between
-                         hover:bg-gray-50 transition-colors group">
-              <span className="font-bold text-gray-700">Ver lista de pedidos</span>
-              <span className="text-brand-700 group-hover:translate-x-1 transition-transform">→</span>
-            </button>
-          </div>
-        )}
-        {activeTab === 'resumen' && !summary && (
-          <div className="bg-white rounded-2xl shadow-sm text-center py-16 text-gray-400">
-            <div className="w-6 h-6 border-2 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-            <p className="text-sm font-medium">Cargando resumen...</p>
-          </div>
-        )}
+        {activeTab === 'resumen' && <ResumenTab setActiveTab={setActiveTab} />}
 
         {/* ── Vista: Pedidos ── */}
         {activeTab === 'pedidos' && <>
@@ -713,6 +658,199 @@ function DailyPrices() {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+// ── SVG Charts ───────────────────────────────────────────────────────────────
+
+function PieChart({ slices }) {
+  const total = slices.reduce((s, d) => s + d.value, 0);
+  if (total === 0) return (
+    <div className="flex items-center justify-center h-28 text-gray-300 text-xs">Sin datos</div>
+  );
+
+  function pt(cx, cy, r, deg) {
+    const rad = ((deg - 90) * Math.PI) / 180;
+    return [cx + r * Math.cos(rad), cy + r * Math.sin(rad)];
+  }
+
+  const cx = 60, cy = 60, R = 52, ri = 30;
+  let angle = 0;
+
+  return (
+    <svg viewBox="0 0 120 120" className="w-28 h-28">
+      {slices.filter(s => s.value > 0).map((s, i) => {
+        const start = angle;
+        const sweep = (s.value / total) * 360;
+        angle += sweep;
+        const end = angle;
+        const [x1, y1] = pt(cx, cy, R, start);
+        const [x2, y2] = pt(cx, cy, R, end);
+        const [ix1, iy1] = pt(cx, cy, ri, start);
+        const [ix2, iy2] = pt(cx, cy, ri, end);
+        const large = sweep > 180 ? 1 : 0;
+        const d = `M ${ix1} ${iy1} L ${x1} ${y1} A ${R} ${R} 0 ${large} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${ri} ${ri} 0 ${large} 0 ${ix1} ${iy1} Z`;
+        return <path key={i} d={d} fill={s.color} stroke="white" strokeWidth="1.5" />;
+      })}
+      <text x={cx} y={cy - 4} textAnchor="middle" fontSize="15" fontWeight="800" fill="#111">{total}</text>
+      <text x={cx} y={cy + 11} textAnchor="middle" fontSize="7.5" fill="#999">pedidos</text>
+    </svg>
+  );
+}
+
+function BarChart({ data }) {
+  const max = Math.max(...data.map(d => d.revenue), 1);
+  const H = 64, bW = 8, gap = 3, W = data.length * (bW + gap);
+  return (
+    <div className="overflow-x-auto pb-1">
+      <svg viewBox={`0 0 ${W} ${H + 18}`} style={{ minWidth: W + 'px', height: 90 }}>
+        {data.map((d, i) => {
+          const h = Math.max(2, (d.revenue / max) * H);
+          const x = i * (bW + gap);
+          return (
+            <g key={i}>
+              <rect x={x} y={H - h} width={bW} height={h}
+                fill={h > 4 ? '#eab308' : '#e5e7eb'} rx="2" />
+              {(d.day === 1 || d.day % 5 === 0) && (
+                <text x={x + bW / 2} y={H + 13} textAnchor="middle"
+                  fontSize="7" fill="#9ca3af">{d.day}</text>
+              )}
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+// ── Resumen Tab ───────────────────────────────────────────────────────────────
+
+function ResumenTab({ setActiveTab }) {
+  const [mode,  setMode]  = useState('day');
+  const [selDate,  setSelDate]  = useState(todayISO());
+  const [selMonth, setSelMonth] = useState(todayISO().slice(0, 7));
+  const [data,  setData]  = useState(null);
+  const [busy,  setBusy]  = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setBusy(true);
+    const fetch = async () => {
+      try {
+        let res;
+        if (mode === 'day') {
+          res = await getDailySummary(selDate);
+        } else {
+          const [y, m] = selMonth.split('-').map(Number);
+          res = await getMonthlySummary(y, m);
+        }
+        if (!cancelled) setData(res.data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (!cancelled) setBusy(false);
+      }
+    };
+    fetch();
+    return () => { cancelled = true; };
+  }, [mode, selDate, selMonth]);
+
+  const STATUS_SLICES = data ? [
+    { label: 'Pendientes', value: data.pending,    color: '#fbbf24' },
+    { label: 'Preparando', value: data.preparing,  color: '#60a5fa' },
+    { label: 'En camino',  value: data.on_the_way, color: '#fb923c' },
+    { label: 'Entregados', value: data.delivered,  color: '#4ade80' },
+    { label: 'Cancelados', value: data.cancelled,  color: '#d1d5db' },
+  ] : [];
+
+  const modeLabel = mode === 'day' ? 'del día' : 'del mes';
+
+  return (
+    <div className="space-y-4">
+      <DailyPrices />
+
+      {/* Filtros de periodo */}
+      <div className="bg-white rounded-2xl shadow-sm p-4 space-y-3">
+        <div className="flex gap-2">
+          {[{ id: 'day', label: 'Por día' }, { id: 'month', label: 'Por mes' }].map(m => (
+            <button key={m.id} onClick={() => setMode(m.id)}
+              className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all
+                ${mode === m.id ? 'bg-brand-900 text-gold-400' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+              {m.label}
+            </button>
+          ))}
+        </div>
+        {mode === 'day' ? (
+          <input type="date" value={selDate}
+            onChange={e => setSelDate(e.target.value)}
+            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400" />
+        ) : (
+          <input type="month" value={selMonth}
+            onChange={e => setSelMonth(e.target.value)}
+            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400" />
+        )}
+      </div>
+
+      {busy && (
+        <div className="bg-white rounded-2xl shadow-sm text-center py-12 text-gray-400">
+          <div className="w-6 h-6 border-2 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm font-medium">Cargando...</p>
+        </div>
+      )}
+
+      {!busy && data && (<>
+        {/* KPI ingresos */}
+        <div className="bg-brand-900 rounded-2xl shadow-sm p-6">
+          <p className="text-gold-400/70 text-xs font-bold uppercase tracking-wider mb-1">
+            Ingresos {modeLabel}
+          </p>
+          <p className="text-4xl font-extrabold text-gold-400">
+            ${parseFloat(data.total_revenue || 0).toFixed(2)}
+          </p>
+          <p className="text-white/40 text-sm mt-1">{data.total_orders} pedidos en total</p>
+        </div>
+
+        {/* Gráfica de barras (solo en mes) */}
+        {mode === 'month' && data.daily && (
+          <div className="bg-white rounded-2xl shadow-sm p-4">
+            <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-3">
+              Ingresos por día (mes)
+            </p>
+            <BarChart data={data.daily} />
+            <p className="text-[10px] text-gray-300 text-right mt-1">día del mes →</p>
+          </div>
+        )}
+
+        {/* Status: pastel + lista */}
+        <div className="bg-white rounded-2xl shadow-sm p-4">
+          <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-4">
+            Estado de pedidos
+          </p>
+          <div className="flex items-center gap-6">
+            <PieChart slices={STATUS_SLICES} />
+            <div className="flex-1 space-y-2.5">
+              {STATUS_SLICES.map(row => (
+                <div key={row.label} className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: row.color }} />
+                    <span className="text-gray-600 font-medium">{row.label}</span>
+                  </div>
+                  <span className="font-extrabold text-gray-900">{row.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <button onClick={() => setActiveTab('pedidos')}
+          className="w-full bg-white rounded-2xl shadow-sm p-4 flex items-center justify-between
+                     hover:bg-gray-50 transition-colors group">
+          <span className="font-bold text-gray-700">Ver lista de pedidos</span>
+          <span className="text-brand-700 group-hover:translate-x-1 transition-transform">→</span>
+        </button>
+      </>)}
     </div>
   );
 }

@@ -223,6 +223,48 @@ export const getDailySummary = async (date = new Date().toISOString().split('T')
   };
 };
 
+export const getMonthlySummary = async (year, month) => {
+  const pad = n => String(n).padStart(2, '0');
+  const startDate = `${year}-${pad(month)}-01`;
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const endDate = `${year}-${pad(month)}-${pad(daysInMonth)}`;
+
+  const { data, error } = await supabase
+    .from('orders')
+    .select('status, total, created_at')
+    .gte('created_at', `${startDate}T00:00:00`)
+    .lte('created_at', `${endDate}T23:59:59`);
+
+  if (error) throw error;
+
+  const nonCancelled = data.filter(o => o.status !== 'cancelado');
+  const total_revenue = nonCancelled.reduce((s, o) => s + parseFloat(o.total || 0), 0);
+
+  const daily = Array.from({ length: daysInMonth }, (_, i) => ({
+    day: i + 1, revenue: 0, orders: 0,
+  }));
+  nonCancelled.forEach(o => {
+    const day = new Date(o.created_at).getDate();
+    if (daily[day - 1]) {
+      daily[day - 1].revenue += parseFloat(o.total || 0);
+      daily[day - 1].orders += 1;
+    }
+  });
+
+  return {
+    data: {
+      total_orders:  data.length,
+      pending:       data.filter(o => o.status === 'pendiente').length,
+      preparing:     data.filter(o => o.status === 'preparando').length,
+      on_the_way:    data.filter(o => o.status === 'en_camino').length,
+      delivered:     data.filter(o => o.status === 'entregado').length,
+      cancelled:     data.filter(o => o.status === 'cancelado').length,
+      total_revenue,
+      daily,
+    },
+  };
+};
+
 // ── Helpers ────────────────────────────────────────────────────
 async function makeOrderNum() {
   const now  = new Date();
