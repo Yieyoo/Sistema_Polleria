@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate }  from 'react-router-dom';
-import { getOrders, updateStatus, getDailySummary, getAdminProducts, updateProduct, createOrder } from '../services/api.js';
+import { getOrders, updateStatus, getDailySummary, getAdminProducts, updateProduct, createOrder, deleteOrder, updateOrder } from '../services/api.js';
 import { supabase } from '../services/supabase.js';
 import StatusBadge, { STATUS_CONFIG } from '../components/StatusBadge.jsx';
 
@@ -36,7 +36,8 @@ export default function Admin() {
   const [filters,  setFilters]  = useState({ status: '', date: todayISO() });
   const [page,     setPage]     = useState(1);
   const [total,    setTotal]    = useState(0);
-  const [selected, setSelected] = useState(null);
+  const [selected,     setSelected]     = useState(null);
+  const [editingOrder, setEditingOrder] = useState(null);
   const LIMIT = 20;
 
   const load = useCallback(async () => {
@@ -96,6 +97,29 @@ export default function Admin() {
     const id = setInterval(load, 30_000);
     return () => clearInterval(id);
   }, [load]);
+
+  const handleDelete = async (orderId) => {
+    if (!window.confirm('¿Eliminar este pedido? Esta acción no se puede deshacer.')) return;
+    try {
+      await deleteOrder(orderId);
+      setOrders(prev => prev.filter(o => o.id !== orderId));
+      setSelected(null);
+      load();
+    } catch {
+      alert('Error al eliminar el pedido.');
+    }
+  };
+
+  const handleEdit = async (orderId, orderData) => {
+    try {
+      await updateOrder(orderId, orderData);
+      setEditingOrder(null);
+      setSelected(null);
+      load();
+    } catch {
+      alert('Error al guardar los cambios.');
+    }
+  };
 
   const handleStatus = async (orderId, status) => {
     try {
@@ -363,6 +387,21 @@ export default function Admin() {
           order={selected}
           onClose={() => setSelected(null)}
           onStatusChange={s => handleStatus(selected.id, s)}
+          onDelete={() => handleDelete(selected.id)}
+          onEdit={() => {
+            setEditingOrder(selected);
+            setSelected(null);
+            if (products.length === 0) loadProducts();
+          }}
+        />
+      )}
+
+      {editingOrder && (
+        <EditOrderModal
+          order={editingOrder}
+          allProducts={products}
+          onClose={() => setEditingOrder(null)}
+          onSave={data => handleEdit(editingOrder.id, data)}
         />
       )}
     </div>
@@ -462,7 +501,7 @@ function OrderCard({ order, onStatusChange, onDetail }) {
 
 // ── Order Detail Modal ────────────────────────────────────────────────────────
 
-function OrderDetailModal({ order, onClose, onStatusChange }) {
+function OrderDetailModal({ order, onClose, onStatusChange, onDelete, onEdit }) {
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl w-full sm:max-w-md max-h-[92vh] overflow-y-auto">
@@ -539,6 +578,28 @@ function OrderDetailModal({ order, onClose, onStatusChange }) {
             </div>
           </section>
 
+          {/* Editar / Eliminar */}
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={onEdit}
+              className="flex items-center justify-center gap-2 py-3 rounded-2xl
+                         bg-blue-50 border border-blue-200 text-blue-700 font-bold text-sm hover:bg-blue-100 transition-colors">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+              Editar pedido
+            </button>
+            <button onClick={onDelete}
+              className="flex items-center justify-center gap-2 py-3 rounded-2xl
+                         bg-red-50 border border-red-200 text-red-600 font-bold text-sm hover:bg-red-100 transition-colors">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+              Eliminar pedido
+            </button>
+          </div>
+
           {/* Ticket buttons */}
           <div className="grid grid-cols-2 gap-2">
             <button onClick={() => printTicket(order)}
@@ -571,6 +632,178 @@ function OrderDetailModal({ order, onClose, onStatusChange }) {
           <p className="text-center text-xs text-gray-400 -mt-3 pb-1">
             Abre WhatsApp con mensaje pre-escrito para {order.customer_name}
           </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Edit Order Modal ──────────────────────────────────────────────────────────
+
+function EditOrderModal({ order, allProducts, onClose, onSave }) {
+  const [customer, setCustomer] = useState({
+    name:  order.customer_name  || '',
+    phone: order.customer_phone || '',
+  });
+  const [payment,    setPayment]    = useState(order.payment_method || 'efectivo');
+  const [notes,      setNotes]      = useState(order.notes || '');
+  const [cart,       setCart]       = useState(
+    (order.items || []).map(i => ({
+      id:    i.product_id,
+      name:  i.product_name,
+      price: parseFloat(i.unit_price),
+      qty:   i.quantity,
+    }))
+  );
+  const [search,     setSearch]     = useState('');
+  const [saving,     setSaving]     = useState(false);
+
+  const available = (allProducts.length > 0 ? allProducts : []).filter(p =>
+    p.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const addToCart = (p) => {
+    setCart(prev => {
+      const ex = prev.find(i => i.id === p.id);
+      if (ex) return prev.map(i => i.id === p.id ? { ...i, qty: i.qty + 1 } : i);
+      return [...prev, { id: p.id, name: p.name, price: parseFloat(p.price || 0), qty: 1 }];
+    });
+  };
+
+  const setQty = (id, qty) => {
+    if (qty < 1) setCart(prev => prev.filter(i => i.id !== id));
+    else setCart(prev => prev.map(i => i.id === id ? { ...i, qty } : i));
+  };
+
+  const subtotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+
+  const save = async () => {
+    if (!customer.name.trim() || !customer.phone.trim() || cart.length === 0) {
+      alert('Completa nombre, teléfono y al menos un producto.');
+      return;
+    }
+    setSaving(true);
+    await onSave({
+      customer_name:  customer.name,
+      customer_phone: customer.phone,
+      payment_method: payment,
+      notes,
+      items: cart.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.qty })),
+    });
+    setSaving(false);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl w-full sm:max-w-md max-h-[95vh] overflow-y-auto">
+        {/* Header */}
+        <div className="sticky top-0 bg-white px-5 pt-5 pb-3 border-b border-gray-100 z-10">
+          <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4 sm:hidden" />
+          <div className="flex items-center justify-between">
+            <h3 className="font-extrabold text-gray-900">Editar — {order.order_number}</h3>
+            <button onClick={onClose} className="p-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 transition-colors">
+              <svg className="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div className="px-5 py-4 space-y-4">
+          {/* Cliente */}
+          <div className="space-y-2">
+            <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Cliente</h4>
+            {[
+              { key: 'name',  label: 'Nombre',   placeholder: 'Nombre completo' },
+              { key: 'phone', label: 'Teléfono', placeholder: '10 dígitos' },
+            ].map(f => (
+              <div key={f.key}>
+                <label className="block text-xs font-semibold text-gray-400 mb-1">{f.label}</label>
+                <input type="text" value={customer[f.key]} placeholder={f.placeholder}
+                  onChange={e => setCustomer(c => ({ ...c, [f.key]: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm
+                             focus:outline-none focus:ring-2 focus:ring-brand-400" />
+              </div>
+            ))}
+          </div>
+
+          {/* Productos */}
+          <div className="space-y-2">
+            <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Productos</h4>
+            <input type="text" placeholder="Buscar producto…" value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm
+                         focus:outline-none focus:ring-2 focus:ring-brand-400" />
+            <div className="max-h-36 overflow-y-auto border border-gray-100 rounded-xl divide-y divide-gray-50">
+              {available.map(p => (
+                <div key={p.id} className="flex items-center justify-between px-3 py-2 hover:bg-gray-50">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{p.name}</p>
+                    <p className="text-xs text-gray-400">${parseFloat(p.price || 0).toFixed(0)}</p>
+                  </div>
+                  <button onClick={() => addToCart(p)}
+                    className="w-7 h-7 rounded-full bg-brand-900 text-white font-bold text-lg
+                               flex items-center justify-center hover:bg-brand-700 transition-colors">+</button>
+                </div>
+              ))}
+              {available.length === 0 && (
+                <p className="text-center text-gray-400 text-sm py-4">Sin resultados</p>
+              )}
+            </div>
+
+            {/* Carrito */}
+            {cart.length > 0 && (
+              <div className="border border-gray-100 rounded-xl divide-y divide-gray-50 mt-1">
+                {cart.map(i => (
+                  <div key={i.id ?? i.name} className="flex items-center gap-2 px-3 py-2">
+                    <span className="flex-1 text-sm font-semibold text-gray-900 truncate">{i.name}</span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button onClick={() => setQty(i.id ?? i.name, i.qty - 1)}
+                        className="w-6 h-6 rounded-full border border-gray-200 text-gray-600 font-bold flex items-center justify-center hover:bg-gray-100">−</button>
+                      <span className="w-5 text-center font-bold text-sm">{i.qty}</span>
+                      <button onClick={() => setQty(i.id ?? i.name, i.qty + 1)}
+                        className="w-6 h-6 rounded-full border border-gray-200 text-gray-600 font-bold flex items-center justify-center hover:bg-gray-100">+</button>
+                    </div>
+                    <span className="text-sm font-bold text-gray-900 w-14 text-right shrink-0">
+                      ${(i.price * i.qty).toFixed(0)}
+                    </span>
+                  </div>
+                ))}
+                <div className="flex justify-between px-3 py-2.5 font-extrabold text-sm bg-gray-50">
+                  <span>Total</span>
+                  <span className="text-brand-700">${subtotal.toFixed(2)}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Pago */}
+          <div>
+            <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Pago</h4>
+            <div className="flex gap-2">
+              {[['efectivo','💵 Efectivo'],['tarjeta','💳 Tarjeta']].map(([v, l]) => (
+                <button key={v} onClick={() => setPayment(v)}
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all
+                    ${payment === v ? 'bg-brand-900 text-gold-400' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}>
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Notas */}
+          <div>
+            <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Notas</label>
+            <textarea rows={2} value={notes} onChange={e => setNotes(e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm resize-none
+                         focus:outline-none focus:ring-2 focus:ring-brand-400" />
+          </div>
+
+          <button onClick={save} disabled={saving}
+            className="w-full py-4 bg-brand-900 hover:bg-brand-800 text-gold-400 font-extrabold
+                       rounded-2xl text-base transition-colors disabled:opacity-60">
+            {saving ? 'Guardando…' : `Guardar cambios · $${subtotal.toFixed(2)}`}
+          </button>
         </div>
       </div>
     </div>

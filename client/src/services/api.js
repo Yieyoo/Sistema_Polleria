@@ -147,6 +147,43 @@ export const getOrders = async ({ page = 1, limit = 20, status, date } = {}) => 
   return { data: { orders, total: count || 0 } };
 };
 
+export const deleteOrder = async (orderId) => {
+  const { error } = await supabase.from('orders').delete().eq('id', orderId);
+  if (error) throw error;
+  return { data: { success: true } };
+};
+
+export const updateOrder = async (orderId, orderData) => {
+  const subtotal = orderData.items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const { error: oErr } = await supabase
+    .from('orders')
+    .update({
+      customer_name:  orderData.customer_name,
+      customer_phone: orderData.customer_phone,
+      payment_method: orderData.payment_method,
+      notes:          orderData.notes || '',
+      subtotal, total: subtotal,
+    })
+    .eq('id', orderId);
+  if (oErr) throw oErr;
+
+  const { error: dErr } = await supabase.from('order_items').delete().eq('order_id', orderId);
+  if (dErr) throw dErr;
+
+  const { error: iErr } = await supabase.from('order_items').insert(
+    orderData.items.map(i => ({
+      order_id:     orderId,
+      product_id:   typeof i.id === 'number' ? i.id : null,
+      product_name: i.name,
+      quantity:     i.quantity,
+      unit_price:   i.price,
+      item_total:   i.price * i.quantity,
+    }))
+  );
+  if (iErr) throw iErr;
+  return { data: { success: true } };
+};
+
 export const updateStatus = async (orderId, status) => {
   const { error } = await supabase
     .from('orders')
