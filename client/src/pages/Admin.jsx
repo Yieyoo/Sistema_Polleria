@@ -203,6 +203,9 @@ export default function Admin() {
         {/* ── Vista: Resumen ── */}
         {activeTab === 'resumen' && summary && (
           <div className="space-y-4">
+            {/* Precios del día */}
+            <DailyPrices />
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Ingresos */}
               <div className="bg-brand-900 rounded-2xl shadow-sm p-6">
@@ -633,6 +636,82 @@ function OrderDetailModal({ order, onClose, onStatusChange, onDelete, onEdit }) 
             Abre WhatsApp con mensaje pre-escrito para {order.customer_name}
           </p>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Daily Prices ─────────────────────────────────────────────────────────────
+
+function DailyPrices() {
+  const [items,   setItems]   = useState([]);
+  const [editing, setEditing] = useState(null);
+  const [tempVal, setTempVal] = useState('');
+  const [saved,   setSaved]   = useState(null);
+
+  useEffect(() => {
+    supabase
+      .from('products')
+      .select('id, name, price, unit')
+      .in('category_id', [1, 2])
+      .order('category_id').order('sort_order')
+      .then(({ data }) => { if (data) setItems(data); });
+  }, []);
+
+  const startEdit = (item) => {
+    setEditing(item.id);
+    setTempVal(String(item.price ?? ''));
+  };
+
+  const commit = async (item) => {
+    const val = parseFloat(tempVal);
+    if (!isNaN(val) && val >= 0) {
+      await updateProduct(item.id, { price: val });
+      setItems(prev => prev.map(i => i.id === item.id ? { ...i, price: val } : i));
+      setSaved(item.id);
+      setTimeout(() => setSaved(null), 2000);
+    }
+    setEditing(null);
+  };
+
+  if (items.length === 0) return null;
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div className="px-4 py-3 bg-brand-900 flex items-center justify-between">
+        <span className="font-bold text-white text-sm">🐔 Precios del día — por kg</span>
+        <span className="text-gold-400/60 text-xs">Toca el precio para editar</span>
+      </div>
+      <div className="grid grid-cols-3 divide-x divide-gray-100">
+        {items.map(item => (
+          <div key={item.id} className="flex flex-col items-center justify-center py-5 px-2 gap-1.5">
+            <p className="text-xs font-bold text-gray-500 text-center leading-tight">{item.name}</p>
+            {editing === item.id ? (
+              <div className="flex items-center gap-0.5">
+                <span className="text-gray-400 text-sm font-bold">$</span>
+                <input
+                  type="number" min="0" step="1" value={tempVal}
+                  onChange={e => setTempVal(e.target.value)}
+                  onBlur={() => commit(item)}
+                  onKeyDown={e => { if (e.key === 'Enter') commit(item); if (e.key === 'Escape') setEditing(null); }}
+                  className="w-16 text-center border-b-2 border-brand-500 text-xl font-extrabold
+                             focus:outline-none bg-transparent"
+                  autoFocus />
+              </div>
+            ) : (
+              <button onClick={() => startEdit(item)}
+                className="flex flex-col items-center group">
+                <span className={`text-2xl font-extrabold transition-colors
+                  ${saved === item.id ? 'text-green-500' : 'text-brand-700 group-hover:text-brand-500'}`}>
+                  ${parseFloat(item.price || 0).toFixed(0)}
+                </span>
+                <span className="text-[10px] text-gray-400 font-medium mt-0.5">
+                  {saved === item.id ? '✓ Guardado' : 'por kg · editar'}
+                </span>
+              </button>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
