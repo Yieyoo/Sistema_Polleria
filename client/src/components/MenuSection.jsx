@@ -70,6 +70,16 @@ function formatPechugas(n) {
   return `${whole} y ½`;
 }
 
+function AgotadoMsg() {
+  return (
+    <div className="flex flex-col items-center gap-2 px-4 py-8 text-center">
+      <span className="text-4xl">🐔</span>
+      <p className="font-semibold text-gray-700">Sin existencias hoy</p>
+      <p className="text-sm text-gray-400">Este producto no está disponible por el momento.</p>
+    </div>
+  );
+}
+
 function PechugarSelector() {
   const { addItem, openCart } = useCart();
   const [rows, setRows] = useState([{ qty: 0.5, pres: 'Entera' }]);
@@ -553,8 +563,12 @@ export default function MenuSection() {
                     <div className="bg-gray-50 border-t border-gray-100">
                       {!(cat.id in freshByCategory) ? (
                         <p className="text-gray-400 text-sm px-4 py-3">Cargando...</p>
+                      ) : cat.id === 1 && products.length === 0 ? (
+                        <AgotadoMsg />
                       ) : cat.id === 1 ? (
                         <PechugarSelector />
+                      ) : cat.id === 2 && products.length === 0 ? (
+                        <AgotadoMsg />
                       ) : cat.id === 2 ? (
                         <CombinadoSelector />
                       ) : cat.id === 12 ? (

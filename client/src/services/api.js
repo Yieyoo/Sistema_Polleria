@@ -64,6 +64,12 @@ export const createOrder = async (orderData) => {
 
   if (itemsError) throw itemsError;
 
+  // Descontar stock de Especialidades
+  const stockItems = orderData.items.filter(i => typeof i.id === 'number' && i.id > 0);
+  await Promise.all(
+    stockItems.map(i => supabase.rpc('decrement_stock', { pid: i.id, amt: i.quantity }))
+  );
+
   const payIcon  = orderData.payment_method === 'efectivo' ? '💵 Efectivo' : '💳 Tarjeta';
   const itemLines = orderData.items
     .map(i => `  • ${i.quantity}x ${i.name}  $${(i.price * i.quantity).toFixed(2)}`)
